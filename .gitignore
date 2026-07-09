@@ -1,0 +1,16 @@
+# Dependencies & build output
+node_modules/
+dist/
+coverage/
+
+# Environment & local config
+.env
+.env.*
+*.local
+
+# Design exports (kept locally, never committed)
+docs/*.zip
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
