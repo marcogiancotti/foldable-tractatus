@@ -4,6 +4,11 @@ Two independent pieces: a static frontend (Vercel) and an optional tiny backend
 (Val Town free plan) for the encrypted "Save notes to link" feature. The app is
 fully functional without the backend — the sync row simply doesn't appear.
 
+> **Status:** the backend is live at `https://tractatus-notes.val.run`
+> (val `spryzone9314/tractatus-notes`, deployed 2026-07-09, daily cleanup cron
+> at 04:00 UTC). Only the Vercel steps below remain; section 2 is kept as
+> reference for redeploying from scratch.
+
 ## 1. Frontend → Vercel
 
 1. In Vercel: **Add New → Project → Import** this GitLab repository
@@ -12,14 +17,18 @@ fully functional without the backend — the sync row simply doesn't appear.
 2. Vercel auto-detects Vite. Defaults are correct:
    - Build command: `npm run build`
    - Output directory: `dist`
-3. (After step 2 below) add the environment variable
-   `VITE_SYNC_ENDPOINT = https://<your-val>.web.val.run` and redeploy.
+3. Add the environment variable
+   `VITE_SYNC_ENDPOINT = https://tractatus-notes.val.run` and redeploy.
    Skip this to ship without cloud sync.
 
 No `vercel.json` is needed — the app is a single page with query-string state,
 so there are no client-side routes to rewrite.
 
 ## 2. Backend → Val Town (free plan)
+
+**Already done** — kept as reference. The custom subdomain
+`tractatus-notes.val.run` points at the HTTP file's generated
+`*.web.val.run` endpoint; either URL works.
 
 The backend stores only opaque, client-encrypted ciphertext. It needs no
 secrets, so a public val is fine (free plan vals are public).
@@ -47,11 +56,11 @@ expected traffic. Val Town's default permissive CORS is used as-is.
 ```sh
 npm install
 npm run dev        # app at localhost:5173
-npm test           # 77 tests: derivation, matching, URL codec, crypto, backend
+npm test           # 81 tests: derivation, matching, URL codec, crypto, backend, smoke
 npm run build      # typecheck + production bundle in dist/
 ```
 
-Optional `.env` (gitignored): `VITE_SYNC_ENDPOINT=https://xxx.web.val.run`
+Optional `.env` (gitignored): `VITE_SYNC_ENDPOINT=https://tractatus-notes.val.run`
 
 The backend tests run the real SQL against an in-memory libsql database — no
 Val Town account needed for development.
