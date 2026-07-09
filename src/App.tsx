@@ -8,6 +8,15 @@ import { READING_PATHS, pathById } from './data/paths';
 import PrintView from './components/PrintView';
 import ReaderGuide from './components/ReaderGuide';
 import { copyText } from './lib/clipboard';
+import {
+  fetchBundle,
+  sanitizeBundlePayload,
+  syncAvailable,
+  SyncError,
+  uploadBundle,
+  type BundlePayload,
+} from './lib/sync/client';
+import { decryptBundle, encryptBundle, generateKey } from './lib/sync/crypto';
 import { downloadMarkdown, exportSelection, toMarkdown } from './lib/export';
 import { useKeyboardNav } from './lib/useKeyboardNav';
 import { useMediaQuery } from './lib/useMediaQuery';
@@ -28,6 +37,7 @@ function AppInner() {
   const [confirmPinOnly, setConfirmPinOnly] = useState(false);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [importPending, setImportPending] = useState<BundlePayload | null>(null);
   const marginMode = useMediaQuery('(min-width: 1180px)');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
@@ -62,6 +72,67 @@ function AppInner() {
     if (n) setPendingScroll(n);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Inbound encrypted bundle: ?bundle=<id> with the key in the #k= fragment.
+  // Captured during the first render, before the URL-sync effect rewrites it.
+  const [inboundBundle] = useState(() => {
+    const id = new URLSearchParams(location.search).get('bundle');
+    const key = new URLSearchParams(location.hash.slice(1)).get('k');
+    return id && key ? { id, key } : null;
+  });
+  useEffect(() => {
+    if (!inboundBundle) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const bundle = await fetchBundle(inboundBundle.id);
+        const payload = sanitizeBundlePayload(
+          await decryptBundle(bundle, inboundBundle.key),
+        );
+        if (cancelled) return;
+        if (payload) setImportPending(payload);
+        else dispatch({ type: 'toast', message: 'This link holds no readable notes' });
+      } catch {
+        if (!cancelled) {
+          dispatch({ type: 'toast', message: "Couldn't open the saved notes in this link" });
+        }
+      } finally {
+        // Drop the key fragment either way — it has no business lingering.
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inboundBundle]);
+
+  const saveToLink = async () => {
+    try {
+      const key = generateKey();
+      const bundle = await encryptBundle(
+        { notes: state.notes, pins: [...state.pins] },
+        key,
+      );
+      const id = await uploadBundle(bundle);
+      const link = `${location.origin}${location.pathname}?bundle=${encodeURIComponent(id)}#k=${key}`;
+      const ok = await copyText(link);
+      dispatch({
+        type: 'toast',
+        message: ok
+          ? 'Private link copied — notes encrypted in your browser'
+          : `Saved. Copy the link manually: ${link}`,
+      });
+    } catch (err) {
+      dispatch({
+        type: 'toast',
+        message:
+          err instanceof SyncError && err.status === 429
+            ? 'Save limit reached — try again in an hour'
+            : "Couldn't save your notes — try again later",
+      });
+    }
+  };
 
   // Keep the link in sync with the view state (spec §7) — replaceState only,
   // never pushState: in-app history stays off the browser Back button (§12).
@@ -210,6 +281,7 @@ function AppInner() {
             onOpenChange={setPanelOpen}
             theme={theme}
             onToggleTheme={toggleTheme}
+            onSaveToLink={syncAvailable() ? saveToLink : undefined}
           />
           {term && termStats && (
             <TermCard
@@ -256,17 +328,32 @@ function AppInner() {
       <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />
       <ConfirmModal
         request={
-          confirmPinOnly && term && termStats
+          importPending
             ? {
-                title: 'Replace your current pins?',
+                title: 'Load notes from this link?',
                 body:
-                  `This pins only the ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
-                  `containing "${term}" and clears your current pins. This is undoable.`,
-                confirmLabel: 'Replace pins',
+                  `This link holds ${Object.keys(importPending.notes).length} annotation` +
+                  `${Object.keys(importPending.notes).length === 1 ? '' : 's'} and ` +
+                  `${importPending.pins.length} pin${importPending.pins.length === 1 ? '' : 's'}. ` +
+                  'Loading them replaces your current annotations and pins. This is undoable.',
+                confirmLabel: 'Load notes',
               }
-            : null
+            : confirmPinOnly && term && termStats
+              ? {
+                  title: 'Replace your current pins?',
+                  body:
+                    `This pins only the ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
+                    `containing "${term}" and clears your current pins. This is undoable.`,
+                  confirmLabel: 'Replace pins',
+                }
+              : null
         }
         onConfirm={() => {
+          if (importPending) {
+            dispatch({ type: 'importBundle', ...importPending });
+            setImportPending(null);
+            return;
+          }
           if (term && termStats) {
             dispatch({
               type: 'applyPins',
@@ -279,7 +366,10 @@ function AppInner() {
           }
           setConfirmPinOnly(false);
         }}
-        onCancel={() => setConfirmPinOnly(false)}
+        onCancel={() => {
+          setImportPending(null);
+          setConfirmPinOnly(false);
+        }}
       />
     </div>
   );

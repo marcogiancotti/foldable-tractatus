@@ -72,6 +72,7 @@ export type AppAction =
     }
   | { type: 'setTerm'; term: string | null }
   | { type: 'setNote'; n: string; text: string }
+  | { type: 'importBundle'; notes: Record<string, string>; pins: string[] }
   | { type: 'endNoteEdit' }
   | { type: 'undo' }
   | { type: 'redo' }
@@ -181,6 +182,15 @@ export function reducer(s: AppState, a: AppAction): AppState {
       if (s.noteEditing === a.n) return { ...s, notes };
       return { ...withHistory(s, { notes }), noteEditing: a.n };
     }
+
+    case 'importBundle':
+      return withHistory(s, {
+        notes: a.notes,
+        pins: new Set(a.pins),
+        overrides: new Map(),
+        activePath: null,
+        toast: makeToast('Notes and pins restored from the link', true),
+      });
 
     case 'endNoteEdit':
       return s.noteEditing === null ? s : { ...s, noteEditing: null };

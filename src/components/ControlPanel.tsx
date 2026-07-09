@@ -40,6 +40,8 @@ interface ControlPanelProps {
   onOpenChange?: (open: boolean) => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  /** encrypted cloud save (spec §7); row hidden when the endpoint isn't configured */
+  onSaveToLink?: () => void;
 }
 
 interface ToolSpec {
@@ -80,6 +82,7 @@ export default function ControlPanel({
   onOpenChange,
   theme,
   onToggleTheme,
+  onSaveToLink,
 }: ControlPanelProps) {
   const [open, setOpen] = useState(true);
   const toggleOpen = () => {
@@ -249,6 +252,19 @@ export default function ControlPanel({
                 <span className="cp-share-label">Share</span>
               </button>
 
+              {onSaveToLink && (
+                <button
+                  type="button"
+                  className="cp-share-row"
+                  title="save encrypted notes under a private link"
+                  onClick={onSaveToLink}
+                >
+                  <span className="cp-share-icon msym" aria-hidden="true">
+                    cloud_upload
+                  </span>
+                  <span className="cp-share-label">Save notes to link</span>
+                </button>
+              )}
               <button
                 type="button"
                 className="cp-share-row"
