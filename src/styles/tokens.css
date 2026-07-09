@@ -1,0 +1,56 @@
+/*
+  Foldable Tractatus — design tokens.
+  Source of truth: handoff design/tokens.md (the locked "Pencil" reference).
+  The accent is slate blue — the handoff's tokens.css gold values were stale.
+
+  Rules of the system: text before boxes; hairlines before fills; one accent,
+  used sparingly; chrome sits at 24% ink until hover; overlays are the only
+  things allowed a shadow.
+*/
+
+:root {
+  /* color — light */
+  --paper: #fbfaf7;
+  --ink100: rgba(33, 31, 27, 1);
+  --ink60: rgba(33, 31, 27, 0.6);
+  --ink40: rgba(60, 50, 30, 0.4);
+  --ink24: rgba(33, 31, 27, 0.24); /* the floor — nothing renders quieter */
+  --accent: #4e6c90;
+  --accent-wash: rgba(88, 116, 150, 0.18);
+  --hover-surface: rgba(60, 50, 30, 0.045);
+  --tap-surface: rgba(60, 50, 30, 0.1);
+  --hairline: rgba(60, 50, 30, 0.1);
+  --control-border: rgba(60, 50, 30, 0.35);
+  --toast-bg: #211f1b;
+  --toast-fg: #fbfaf7;
+  --shadow-overlay: 0 4px 16px rgba(60, 50, 30, 0.12);
+
+  /* the prototype calls the accent "ochre"; alias it so its excerpts port verbatim */
+  --ochre: var(--accent);
+  --ochre-wash: var(--accent-wash);
+
+  /* type */
+  --font-body: 'Hanken Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* surfaces */
+  --radius: 4px;
+  --radius-sm: 3px;
+}
+
+:root[data-theme='dark'] {
+  --paper: #181613;
+  --ink100: rgba(233, 230, 223, 1);
+  --ink60: rgba(233, 230, 223, 0.6);
+  --ink40: rgba(233, 230, 223, 0.4);
+  --ink24: rgba(233, 230, 223, 0.22);
+  --accent: #93b4d8;
+  --accent-wash: rgba(140, 170, 205, 0.22);
+  --hover-surface: rgba(233, 230, 223, 0.06);
+  --tap-surface: rgba(233, 230, 223, 0.1);
+  --hairline: rgba(233, 230, 223, 0.12);
+  --control-border: rgba(233, 230, 223, 0.3);
+  --toast-bg: #e9e6df;
+  --toast-fg: #181613;
+  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.4);
+}

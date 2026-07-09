@@ -1,0 +1,81 @@
+@import './tokens.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink100);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+/* Material Symbols rendered as bare glyphs */
+.msym {
+  font-family: 'Material Symbols Outlined';
+  font-weight: 300;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: 'opsz' 20, 'wght' 300, 'FILL' 0, 'GRAD' 0;
+  user-select: none;
+}
+
+/* ---- app shell: three columns, centered ---- */
+
+.app-root {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  padding: 0 40px;
+  min-height: 100vh;
+}
+
+.reading-col {
+  flex: 0 1 720px;
+  max-width: 720px;
+  width: 100%;
+  padding: 76px 0 108px;
+}
+
+.note-rail {
+  width: 236px;
+  flex: 0 0 auto;
+}
+
+.panel-col {
+  flex: 0 0 auto;
+}
+
+.panel-sticky {
+  position: sticky;
+  top: 78px;
+}
+
+@media (max-width: 1179px) {
+  .note-rail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
