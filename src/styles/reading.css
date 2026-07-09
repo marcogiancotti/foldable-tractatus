@@ -268,6 +268,121 @@
   user-select: none;
 }
 
+/* ---- annotation note: rest / hover / editing ---- */
+
+.note-wrap.is-margin {
+  position: absolute;
+  top: 5px;
+  left: calc(100% + 44px);
+  width: 236px;
+}
+
+.note-wrap.is-inline {
+  max-width: 470px;
+}
+
+.note-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-left: 2px solid transparent;
+  padding-left: 9px;
+  cursor: text;
+  transition: border-color 120ms ease;
+}
+
+.note-box:hover,
+.note-box:focus-visible {
+  border-left-color: var(--accent);
+}
+
+.note-text {
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink60);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+  transition: color 120ms ease;
+}
+
+.note-box:hover .note-text,
+.note-box:focus-visible .note-text {
+  color: var(--ink100);
+}
+
+.note-pencil {
+  flex: none;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--ink24);
+  opacity: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 120ms ease;
+}
+
+.note-box:hover .note-pencil {
+  opacity: 1;
+}
+
+.note-edit-box {
+  border-left: 2px solid var(--accent);
+  padding-left: 9px;
+}
+
+.note-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink100);
+  min-height: 21px;
+  caret-color: var(--accent);
+}
+
+.note-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink40);
+  margin-top: 4px;
+}
+
+.row-note-btn {
+  flex: none;
+  align-self: baseline;
+  margin-left: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  transform: translateY(2.5px);
+  font-size: 18px;
+  line-height: 1.62;
+  color: var(--ink24);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.row:hover .row-note-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.row-note-btn:hover {
+  color: var(--ink60);
+}
+
 /* ---- peek range: the quietest element ---- */
 
 .peek-row {

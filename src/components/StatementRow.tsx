@@ -1,6 +1,7 @@
 import type { RowState } from '../model/focusedView';
 import { ownCount, subtreeCount } from '../model/match';
 import { statement } from '../model/tree';
+import AnnotationNote from './AnnotationNote';
 import StatementText from './StatementText';
 
 interface Props {
@@ -9,9 +10,15 @@ interface Props {
   state: RowState;
   pinned: boolean;
   activeTerm: string | null;
+  note?: string;
+  noteEditing: boolean;
+  marginMode: boolean;
   onToggle: (n: string, expand: boolean) => void;
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
+  onStartEditNote: (n: string) => void;
+  onCommitNote: (n: string, text: string) => void;
+  onStopEditNote: () => void;
 }
 
 const INDENT_BASE = 4;
@@ -23,13 +30,21 @@ export default function StatementRow({
   state,
   pinned,
   activeTerm,
+  note,
+  noteEditing,
+  marginMode,
   onToggle,
   onPin,
   onSelectTerm,
+  onStartEditNote,
+  onCommitNote,
+  onStopEditNote,
 }: Props) {
   const s = statement(n);
   const hasChildren = s.children.length > 0;
   const expanded = hasChildren && state === 'full';
+  const indent = INDENT_BASE + depth * INDENT_STEP;
+  const hasNote = note !== undefined || noteEditing;
 
   // Occurrences of the active term hidden inside a collapsed subtree (spec §9).
   const hiddenCount =
@@ -37,10 +52,7 @@ export default function StatementRow({
 
   return (
     <div className="row-group">
-      <div
-        className={`row ${pinned ? 'is-pinned' : ''}`}
-        style={{ paddingLeft: INDENT_BASE + depth * INDENT_STEP }}
-      >
+      <div className={`row ${pinned ? 'is-pinned' : ''}`} style={{ paddingLeft: indent }}>
         <button
           className={`row-toggle msym ${expanded ? 'is-expanded' : ''} ${hasChildren ? '' : 'is-hidden'}`}
           aria-label={expanded ? `Fold statement ${n}` : `Unfold statement ${n}`}
@@ -63,6 +75,16 @@ export default function StatementRow({
             </span>
           </span>
         )}
+        {!hasNote && (
+          <button
+            className="row-note-btn msym"
+            aria-label={`Add note to statement ${n}`}
+            title="add note"
+            onClick={() => onStartEditNote(n)}
+          >
+            edit_note
+          </button>
+        )}
         <button
           className={`row-pin msym ${pinned ? 'is-pinned' : ''}`}
           aria-label={pinned ? `Unpin statement ${n}` : `Pin statement ${n}`}
@@ -73,6 +95,18 @@ export default function StatementRow({
           push_pin
         </button>
       </div>
+      {hasNote && (
+        <AnnotationNote
+          n={n}
+          indent={indent}
+          text={note ?? ''}
+          editing={noteEditing}
+          marginMode={marginMode}
+          onStartEdit={() => onStartEditNote(n)}
+          onCommit={(text) => onCommitNote(n, text)}
+          onStopEdit={onStopEditNote}
+        />
+      )}
     </div>
   );
 }

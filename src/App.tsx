@@ -5,6 +5,7 @@ import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
+import { useMediaQuery } from './lib/useMediaQuery';
 import { deriveDisplay } from './model/focusedView';
 import { matchingStatements, ownCount } from './model/match';
 import { STATEMENTS } from './model/tree';
@@ -17,6 +18,8 @@ function AppInner() {
   const searchRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [confirmPinOnly, setConfirmPinOnly] = useState(false);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const marginMode = useMediaQuery('(min-width: 1180px)');
 
   const display = useMemo(
     () => deriveDisplay(state.pins, state.overrides),
@@ -120,12 +123,20 @@ function AppInner() {
         display={display}
         pins={state.pins}
         activeTerm={term}
+        notes={state.notes}
+        editingNote={editingNote}
+        marginMode={marginMode}
         onToggle={(n, expand) => dispatch({ type: 'toggleRow', n, expand })}
         onPromote={(members) => dispatch({ type: 'promotePeeks', members })}
         onPin={(n) => dispatch({ type: 'togglePin', n })}
         onSelectTerm={(canonical) => dispatch({ type: 'setTerm', term: canonical })}
+        onStartEditNote={setEditingNote}
+        onCommitNote={(n, text) => dispatch({ type: 'setNote', n, text })}
+        onStopEditNote={() => {
+          setEditingNote(null);
+          dispatch({ type: 'endNoteEdit' });
+        }}
         firstRowRef={firstRowRef}
-        annotationCount={Object.keys(state.notes).length}
       />
       <div className="note-rail" aria-hidden="true" />
       <UndoToast

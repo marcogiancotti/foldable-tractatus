@@ -11,10 +11,12 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useReducer,
   type Dispatch,
   type ReactNode,
 } from 'react';
+import { loadNotes, saveNotes } from './persistence';
 import {
   foldAllOverrides,
   promotePeeks,
@@ -67,6 +69,7 @@ export type AppAction =
     }
   | { type: 'setTerm'; term: string | null }
   | { type: 'setNote'; n: string; text: string }
+  | { type: 'endNoteEdit' }
   | { type: 'undo' }
   | { type: 'redo' }
   | { type: 'toast'; message: string; undoable?: boolean }
@@ -173,6 +176,9 @@ export function reducer(s: AppState, a: AppAction): AppState {
       return { ...withHistory(s, { notes }), noteEditing: a.n };
     }
 
+    case 'endNoteEdit':
+      return s.noteEditing === null ? s : { ...s, noteEditing: null };
+
     case 'undo': {
       if (!s.past.length) return s;
       const prev = s.past[s.past.length - 1];
@@ -215,7 +221,11 @@ const StoreContext = createContext<{ state: AppState; dispatch: Dispatch<AppActi
 );
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, (init) => ({
+    ...init,
+    notes: loadNotes(),
+  }));
+  useEffect(() => saveNotes(state.notes), [state.notes]);
   return <StoreContext.Provider value={{ state, dispatch }}>{children}</StoreContext.Provider>;
 }
 
