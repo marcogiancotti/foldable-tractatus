@@ -7,9 +7,11 @@ import StatementRow from './StatementRow';
 interface Props {
   display: DisplayItem[];
   pins: ReadonlySet<string>;
+  activeTerm: string | null;
   onToggle: (n: string, expand: boolean) => void;
   onPromote: (members: string[]) => void;
   onPin: (n: string) => void;
+  onSelectTerm: (canonical: string) => void;
   /** empty marker before the first row — the control panel aligns its top to it */
   firstRowRef?: Ref<HTMLDivElement>;
   annotationCount?: number;
@@ -18,9 +20,11 @@ interface Props {
 export default function ReadingColumn({
   display,
   pins,
+  activeTerm,
   onToggle,
   onPromote,
   onPin,
+  onSelectTerm,
   firstRowRef,
   annotationCount = 0,
 }: Props) {
@@ -68,8 +72,10 @@ export default function ReadingColumn({
               depth={item.depth}
               state={item.state}
               pinned={pins.has(item.n)}
+              activeTerm={activeTerm}
               onToggle={onToggle}
               onPin={onPin}
+              onSelectTerm={onSelectTerm}
             />
           ) : (
             <PeekRange
@@ -77,6 +83,7 @@ export default function ReadingColumn({
               depth={item.depth}
               members={item.members}
               label={item.label}
+              activeTerm={activeTerm}
               onPromote={onPromote}
             />
           ),

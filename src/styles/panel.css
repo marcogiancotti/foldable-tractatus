@@ -664,3 +664,111 @@
 .cp-export-item:hover {
   background: var(--hover-surface);
 }
+
+/* ================= selected-term card ================= */
+
+.term-card {
+  width: 176px;
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  box-shadow: var(--shadow-overlay);
+  padding: 14px 16px 15px;
+  transition: width 180ms ease;
+}
+
+.term-card.is-narrow {
+  width: 108px;
+}
+
+.term-card-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.term-sel-label {
+  flex: none;
+  font-size: 13px;
+  color: var(--ink60);
+  user-select: none;
+}
+
+.term-chip {
+  font-size: 14px;
+  color: var(--ink100);
+  background: var(--accent-wash);
+  border-radius: 3px;
+  padding: 1px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.term-close {
+  flex: none;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink40);
+  cursor: pointer;
+  user-select: none;
+  transition: color 120ms ease;
+}
+
+.term-close:hover {
+  color: var(--ink100);
+}
+
+.term-stat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink40);
+  margin: 10px 0 13px;
+}
+
+.term-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.term-pin-only {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink100);
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  padding: 5px 12px;
+  background: transparent;
+  transition: background 120ms ease;
+}
+
+.term-pin-only:hover {
+  background: var(--hover-surface);
+}
+
+.term-add-pins {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink60);
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: color 120ms ease;
+}
+
+.term-add-pins:hover {
+  color: var(--ink100);
+}

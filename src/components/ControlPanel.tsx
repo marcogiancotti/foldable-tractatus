@@ -36,6 +36,8 @@ interface ControlPanelProps {
   termActive: boolean;
   termCount: number; // total occurrences, shown when termActive
   searchRef?: Ref<HTMLInputElement>;
+  /** notified when the panel collapses/opens (the term card matches its width) */
+  onOpenChange?: (open: boolean) => void;
 }
 
 interface ToolSpec {
@@ -73,8 +75,14 @@ export default function ControlPanel({
   termActive,
   termCount,
   searchRef,
+  onOpenChange,
 }: ControlPanelProps) {
   const [open, setOpen] = useState(true);
+  const toggleOpen = () => {
+    const next = !open;
+    setOpen(next);
+    onOpenChange?.(next);
+  };
   const [searchFocused, setSearchFocused] = useState(false);
   const [threadsOpen, setThreadsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -120,11 +128,11 @@ export default function ControlPanel({
         aria-expanded={open}
         aria-label={open ? 'Collapse panel' : 'Show controls'}
         title={open ? 'collapse panel' : 'show controls'}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setOpen((v) => !v);
+            toggleOpen();
           }
         }}
       >
