@@ -20,6 +20,7 @@ import { loadNotes, saveNotes } from './persistence';
 import {
   foldAllOverrides,
   promotePeeks,
+  revealStatement,
   setRowExpansion,
   expandSubtree,
   unfoldAllOverrides,
@@ -56,6 +57,7 @@ export type AppAction =
   | { type: 'toggleRow'; n: string; expand: boolean }
   | { type: 'promotePeeks'; members: string[] }
   | { type: 'expandSubtree'; n: string }
+  | { type: 'reveal'; n: string }
   | { type: 'foldAll' }
   | { type: 'unfoldAll' }
   | { type: 'togglePin'; n: string }
@@ -123,6 +125,9 @@ export function reducer(s: AppState, a: AppAction): AppState {
 
     case 'expandSubtree':
       return withHistory(s, { overrides: expandSubtree(s.pins, s.overrides, a.n) });
+
+    case 'reveal':
+      return withHistory(s, { overrides: revealStatement(s.pins, s.overrides, a.n) });
 
     case 'foldAll':
       return withHistory(s, { overrides: foldAllOverrides() });

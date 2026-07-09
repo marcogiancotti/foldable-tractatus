@@ -3,12 +3,14 @@ import { ownCount, subtreeCount } from '../model/match';
 import { statement } from '../model/tree';
 import AnnotationNote from './AnnotationNote';
 import StatementText from './StatementText';
+import XRefPreview from './XRefPreview';
 
 interface Props {
   n: string;
   depth: number;
   state: RowState;
   pinned: boolean;
+  flash: boolean;
   activeTerm: string | null;
   note?: string;
   noteEditing: boolean;
@@ -16,6 +18,7 @@ interface Props {
   onToggle: (n: string, expand: boolean) => void;
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
+  onNavigate: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
@@ -29,6 +32,7 @@ export default function StatementRow({
   depth,
   state,
   pinned,
+  flash,
   activeTerm,
   note,
   noteEditing,
@@ -36,6 +40,7 @@ export default function StatementRow({
   onToggle,
   onPin,
   onSelectTerm,
+  onNavigate,
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
@@ -52,7 +57,16 @@ export default function StatementRow({
 
   return (
     <div className="row-group">
-      <div className={`row ${pinned ? 'is-pinned' : ''}`} style={{ paddingLeft: indent }}>
+      <div
+        className={`row ${pinned ? 'is-pinned' : ''} ${flash ? 'is-flash' : ''}`}
+        style={{ paddingLeft: indent }}
+        tabIndex={-1}
+        data-nav=""
+        data-n={n}
+        data-expanded={expanded ? '1' : '0'}
+        data-has-children={hasChildren ? '1' : '0'}
+        aria-label={`Statement ${n}`}
+      >
         <button
           className={`row-toggle msym ${expanded ? 'is-expanded' : ''} ${hasChildren ? '' : 'is-hidden'}`}
           aria-label={expanded ? `Fold statement ${n}` : `Unfold statement ${n}`}
@@ -66,6 +80,7 @@ export default function StatementRow({
         <span className="row-num">{n}</span>
         <span className="row-text">
           <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
+          {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
         </span>
         {hiddenCount > 0 && (
           <span className="row-badge-wrap">

@@ -89,6 +89,15 @@
   background: var(--hover-surface);
 }
 
+.row:focus {
+  outline: none;
+  background: var(--hover-surface);
+}
+
+.row.is-pinned:focus {
+  background: var(--accent-wash);
+}
+
 .row.is-pinned,
 .row.is-flash {
   background: var(--accent-wash);

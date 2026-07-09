@@ -167,6 +167,26 @@ export function expandSubtree(
   return normalizeOverrides(pins, next);
 }
 
+/**
+ * Make a statement visible with minimal disturbance (cross-ref navigation,
+ * deep links): expand folded ancestors, promote the target if it would peek.
+ */
+export function revealStatement(
+  pins: Pins,
+  overrides: Overrides,
+  n: string,
+): Map<string, boolean> {
+  const next = new Map(overrides);
+  const stateOf = (id: string) =>
+    deriveFlat(pins, next).find((e) => e.n === id)?.state;
+  for (const a of [...ancestorsOf(n)].reverse()) {
+    const st = stateOf(a);
+    if (st !== 'full') next.set(a, true); // hidden/peek/collapsed → open it
+  }
+  if (stateOf(n) === 'peek') next.set(n, false); // promote, subtree stays folded
+  return normalizeOverrides(pins, next);
+}
+
 /** Fold all: clear overrides — focused view when pins exist, bare roots otherwise (spec §3). */
 export function foldAllOverrides(): Map<string, boolean> {
   return new Map();

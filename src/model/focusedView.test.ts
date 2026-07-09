@@ -5,6 +5,7 @@ import {
   expandSubtree,
   foldAllOverrides,
   promotePeeks,
+  revealStatement,
   setRowExpansion,
   unfoldAllOverrides,
 } from './focusedView';
@@ -177,6 +178,31 @@ describe('structural invariants (no level-skipping)', () => {
       const stateOf = new Map(deriveFlat(p, noOv).map((e) => [e.n, e.state]));
       for (const id of p) expect(stateOf.get(id)).toBe('full');
     }
+  });
+});
+
+describe('revealStatement (cross-ref navigation, deep links)', () => {
+  it('expands the ancestor chain of a hidden statement', () => {
+    const ov = revealStatement(none, noOv, '2.141');
+    const flat = ids(deriveFlat(none, ov));
+    expect(flat).toContain('2.141:full');
+    expect(flat).toContain('2:full');
+    expect(flat).toContain('2.1:full');
+    expect(flat).toContain('2.14:full');
+  });
+
+  it('promotes a peek target without disturbing its peek siblings', () => {
+    const p = pins('2.11');
+    const ov = revealStatement(p, noOv, '2.14');
+    const flat = ids(deriveFlat(p, ov));
+    expect(flat).toContain('2.14:collapsed'); // promoted, subtree still folded
+    expect(flat).toContain('2.12:peek'); // siblings untouched
+    expect(flat).toContain('2.13:peek');
+  });
+
+  it('is a no-op for an already-visible statement', () => {
+    const p = pins('2.11');
+    expect(revealStatement(p, noOv, '2.11').size).toBe(0);
   });
 });
 

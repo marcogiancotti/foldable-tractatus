@@ -10,11 +10,13 @@ interface Props {
   activeTerm: string | null;
   notes: Readonly<Record<string, string>>;
   editingNote: string | null;
+  flashN: string | null;
   marginMode: boolean;
   onToggle: (n: string, expand: boolean) => void;
   onPromote: (members: string[]) => void;
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
+  onNavigate: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
@@ -28,11 +30,13 @@ export default function ReadingColumn({
   activeTerm,
   notes,
   editingNote,
+  flashN,
   marginMode,
   onToggle,
   onPromote,
   onPin,
   onSelectTerm,
+  onNavigate,
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
@@ -83,6 +87,7 @@ export default function ReadingColumn({
               depth={item.depth}
               state={item.state}
               pinned={pins.has(item.n)}
+              flash={flashN === item.n}
               activeTerm={activeTerm}
               note={notes[item.n]}
               noteEditing={editingNote === item.n}
@@ -90,6 +95,7 @@ export default function ReadingColumn({
               onToggle={onToggle}
               onPin={onPin}
               onSelectTerm={onSelectTerm}
+              onNavigate={onNavigate}
               onStartEditNote={onStartEditNote}
               onCommitNote={onCommitNote}
               onStopEditNote={onStopEditNote}

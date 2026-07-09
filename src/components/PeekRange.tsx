@@ -22,6 +22,8 @@ export default function PeekRange({ depth, members, label, activeTerm, onPromote
       style={{ paddingLeft: INDENT_BASE + depth * INDENT_STEP }}
       title={title}
       aria-label={`${title}: ${label}`}
+      data-nav=""
+      data-peek-members={members.join(',')}
       onClick={() => onPromote(members)}
     >
       <span className="peek-toggle msym" aria-hidden="true">

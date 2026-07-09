@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ConfirmModal from './components/ConfirmModal';
 import ControlPanel from './components/ControlPanel';
 import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
+import { useKeyboardNav } from './lib/useKeyboardNav';
 import { useMediaQuery } from './lib/useMediaQuery';
 import { deriveDisplay } from './model/focusedView';
 import { matchingStatements, ownCount } from './model/match';
@@ -19,7 +20,51 @@ function AppInner() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [confirmPinOnly, setConfirmPinOnly] = useState(false);
   const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
   const marginMode = useMediaQuery('(min-width: 1180px)');
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+
+  // Cross-ref / deep-link navigation: reveal → scroll to ~30% viewport → flash.
+  const [flashN, setFlashN] = useState<string | null>(null);
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const navigateToStatement = (n: string) => {
+    dispatch({ type: 'reveal', n });
+    setPendingScroll(n);
+  };
+  useEffect(() => {
+    if (!pendingScroll) return;
+    const el = document.querySelector<HTMLElement>(`[data-n="${CSS.escape(pendingScroll)}"]`);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      window.scrollTo({
+        top: window.scrollY + rect.top - window.innerHeight * 0.3,
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
+      el.focus({ preventScroll: true });
+      setFlashN(pendingScroll);
+      clearTimeout(flashTimer.current);
+      flashTimer.current = setTimeout(() => setFlashN(null), 1600);
+    }
+    setPendingScroll(null);
+  }, [pendingScroll, reducedMotion]);
+
+  useKeyboardNav({
+    toggleRow: (n, expand) => dispatch({ type: 'toggleRow', n, expand }),
+    expandSubtree: (n) => dispatch({ type: 'expandSubtree', n }),
+    promotePeeks: (members) => dispatch({ type: 'promotePeeks', members }),
+    togglePin: (n) => dispatch({ type: 'togglePin', n }),
+    editNote: (n) => setEditingNote(n),
+    focusSearch: () => searchRef.current?.focus(),
+    openHelp: () => setHelpOpen(true),
+    escape: () => {
+      if (helpOpen) setHelpOpen(false);
+      else if (state.activeTerm) dispatch({ type: 'setTerm', term: null });
+      else (document.activeElement as HTMLElement | null)?.blur?.();
+    },
+    undo: () => dispatch({ type: 'undo' }),
+    redo: () => dispatch({ type: 'redo' }),
+  });
 
   const display = useMemo(
     () => deriveDisplay(state.pins, state.overrides),
@@ -78,7 +123,7 @@ function AppInner() {
             onUnfoldAll={() => dispatch({ type: 'unfoldAll' })}
             onUndo={() => dispatch({ type: 'undo' })}
             onRedo={() => dispatch({ type: 'redo' })}
-            onHelp={() => {}}
+            onHelp={() => setHelpOpen(true)}
             onShare={() => {}}
             onExportMarkdown={() => {}}
             onExportPdf={() => {}}
@@ -125,11 +170,13 @@ function AppInner() {
         activeTerm={term}
         notes={state.notes}
         editingNote={editingNote}
+        flashN={flashN}
         marginMode={marginMode}
         onToggle={(n, expand) => dispatch({ type: 'toggleRow', n, expand })}
         onPromote={(members) => dispatch({ type: 'promotePeeks', members })}
         onPin={(n) => dispatch({ type: 'togglePin', n })}
         onSelectTerm={(canonical) => dispatch({ type: 'setTerm', term: canonical })}
+        onNavigate={navigateToStatement}
         onStartEditNote={setEditingNote}
         onCommitNote={(n, text) => dispatch({ type: 'setNote', n, text })}
         onStopEditNote={() => {
