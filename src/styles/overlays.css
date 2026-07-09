@@ -1,0 +1,165 @@
+/* Overlays — the confirm modal and the undo/copy toast. These are the only
+   two floating surfaces (plus menus, out of scope here) that get the overlay
+   shadow, and the toast is the one deliberately inverted element. */
+
+/* ---- undo / copy toast ---- */
+
+.toast-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 60;
+}
+
+.toast-card {
+  position: relative;
+  overflow: hidden; /* clips the countdown bar to the chip's rounded corners */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--toast-bg);
+  border-radius: var(--radius);
+  padding: 9px 16px 11px;
+  box-shadow: var(--shadow-overlay);
+  font-family: var(--font-body);
+  animation: toast-in 240ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-msg {
+  font-size: 13.5px;
+  color: var(--toast-fg);
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
+.toast-undo {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--toast-fg);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--toast-fg) 45%, transparent);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: text-decoration-color 120ms ease;
+}
+
+.toast-undo:hover {
+  text-decoration-color: var(--toast-fg);
+}
+
+/* Countdown bar — undoable variant only. Never render this for the plain
+   copy/info toast, and its transition duration must always equal the dwell
+   it's visualizing (set inline, per-toast, in UndoToast.tsx). */
+.toast-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: color-mix(in srgb, var(--toast-fg) 30%, transparent);
+  transform-origin: left;
+}
+
+/* ---- confirm modal ---- */
+
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(33, 31, 27, 0.28);
+}
+
+:root[data-theme='dark'] .modal-scrim {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.modal-card {
+  width: 344px;
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  box-shadow: var(--shadow-overlay);
+  padding: 22px 24px 20px;
+  font-family: var(--font-body);
+}
+
+.modal-title {
+  margin: 0 0 10px;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--ink100);
+}
+
+.modal-body {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink60);
+  text-wrap: pretty;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 18px;
+}
+
+.modal-confirm {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink100);
+  background: none;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.modal-confirm:hover {
+  background: var(--hover-surface);
+}
+
+.modal-cancel {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink60);
+  background: none;
+  border: none;
+  padding: 7px 4px;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.modal-cancel:hover {
+  color: var(--ink100);
+}
+
+.modal-confirm:focus-visible,
+.modal-cancel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

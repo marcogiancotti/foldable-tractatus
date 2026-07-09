@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "valtown@claude-plugins-official": true
+  }
+}

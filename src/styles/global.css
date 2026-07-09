@@ -1,5 +1,7 @@
 @import './tokens.css';
 @import './reading.css';
+@import './panel.css';
+@import './overlays.css';
 
 * {
   box-sizing: border-box;

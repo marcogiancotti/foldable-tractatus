@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import type { DisplayItem } from '../model/focusedView';
 import { ROOT_IDS, STATEMENTS } from '../model/tree';
 import PeekRange from './PeekRange';
@@ -5,15 +6,22 @@ import StatementRow from './StatementRow';
 
 interface Props {
   display: DisplayItem[];
+  pins: ReadonlySet<string>;
   onToggle: (n: string, expand: boolean) => void;
   onPromote: (members: string[]) => void;
+  onPin: (n: string) => void;
+  /** empty marker before the first row — the control panel aligns its top to it */
+  firstRowRef?: Ref<HTMLDivElement>;
   annotationCount?: number;
 }
 
 export default function ReadingColumn({
   display,
+  pins,
   onToggle,
   onPromote,
+  onPin,
+  firstRowRef,
   annotationCount = 0,
 }: Props) {
   return (
@@ -50,6 +58,7 @@ export default function ReadingColumn({
         <div className="rc-book-title">Tractatus Logico-Philosophicus</div>
         <div className="rc-book-byline">Ludwig Wittgenstein, 1922 (Ogden translation)</div>
       </header>
+      <div ref={firstRowRef} />
       <section aria-label="Statements">
         {display.map((item) =>
           item.kind === 'row' ? (
@@ -58,7 +67,9 @@ export default function ReadingColumn({
               n={item.n}
               depth={item.depth}
               state={item.state}
+              pinned={pins.has(item.n)}
               onToggle={onToggle}
+              onPin={onPin}
             />
           ) : (
             <PeekRange

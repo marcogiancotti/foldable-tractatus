@@ -157,6 +157,117 @@
   text-wrap: pretty;
 }
 
+.row-pin {
+  flex: none;
+  align-self: baseline;
+  margin-left: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  transform: translateY(2.5px);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink24);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  user-select: none;
+  font-variation-settings: 'FILL' 0;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.row:hover .row-pin,
+.row-pin.is-pinned {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.row-pin.is-pinned {
+  color: var(--accent);
+  font-variation-settings: 'FILL' 1;
+}
+
+/* ---- inline term marks & active-term highlight ---- */
+
+.idx-term {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-bottom: 1px dotted var(--ink24);
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.idx-term:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.idx-term.is-hit,
+.term-hit {
+  background: var(--accent-wash);
+  border-radius: 3px;
+  padding: 0 2px;
+  color: var(--ink100);
+}
+
+/* ---- occurrence badge (collapsed rows, term active) ---- */
+
+.row-badge-wrap {
+  position: relative;
+  flex: none;
+  align-self: baseline;
+  margin-left: 2px;
+}
+
+.row-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.62;
+  color: var(--accent);
+  background: var(--accent-wash);
+  border-radius: 3px;
+  padding: 0 6px;
+  cursor: default;
+  user-select: none;
+}
+
+.badge-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.row-badge-wrap:hover .badge-tip {
+  opacity: 1;
+}
+
+.peek-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.62;
+  color: var(--accent);
+  background: var(--accent-wash);
+  border-radius: 8px;
+  padding: 0 7px;
+  margin-left: 8px;
+  cursor: default;
+  user-select: none;
+}
+
 /* ---- peek range: the quietest element ---- */
 
 .peek-row {
