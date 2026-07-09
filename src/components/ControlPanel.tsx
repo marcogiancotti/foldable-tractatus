@@ -38,6 +38,8 @@ interface ControlPanelProps {
   searchRef?: Ref<HTMLInputElement>;
   /** notified when the panel collapses/opens (the term card matches its width) */
   onOpenChange?: (open: boolean) => void;
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
 interface ToolSpec {
@@ -76,6 +78,8 @@ export default function ControlPanel({
   termCount,
   searchRef,
   onOpenChange,
+  theme,
+  onToggleTheme,
 }: ControlPanelProps) {
   const [open, setOpen] = useState(true);
   const toggleOpen = () => {
@@ -243,6 +247,20 @@ export default function ControlPanel({
                   link
                 </span>
                 <span className="cp-share-label">Share</span>
+              </button>
+
+              <button
+                type="button"
+                className="cp-share-row"
+                title="switch theme"
+                onClick={onToggleTheme}
+              >
+                <span className="cp-share-icon msym" aria-hidden="true">
+                  {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                </span>
+                <span className="cp-share-label">
+                  {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                </span>
               </button>
 
               <div className="cp-export-wrap" ref={exportWrapRef}>

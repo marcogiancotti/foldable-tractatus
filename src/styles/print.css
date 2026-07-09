@@ -1,0 +1,91 @@
+/* The print view exists only on paper (spec §8 — PDF via the print dialog). */
+
+.print-view {
+  display: none;
+}
+
+@media print {
+  .app-root,
+  .toast-wrap,
+  .modal-scrim {
+    display: none !important;
+  }
+
+  .print-view {
+    display: block;
+    font-family: var(--font-body);
+    color: #211f1b;
+  }
+
+  @page {
+    margin: 22mm 20mm;
+  }
+
+  .pv-title {
+    font-weight: 300;
+    font-size: 26pt;
+    letter-spacing: -0.4px;
+    margin: 0 0 6pt;
+  }
+
+  .pv-byline {
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(33, 31, 27, 0.55);
+    margin-bottom: 4pt;
+  }
+
+  .pv-meta {
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    color: rgba(33, 31, 27, 0.55);
+  }
+
+  .pv-rule {
+    border: none;
+    border-top: 1px solid rgba(60, 50, 30, 0.25);
+    margin: 12pt 0 16pt;
+  }
+
+  .pv-entry {
+    break-inside: avoid;
+    margin-bottom: 7pt;
+  }
+
+  .pv-row {
+    display: flex;
+    align-items: baseline;
+    gap: 9pt;
+  }
+
+  .pv-num {
+    flex: none;
+    min-width: 34pt;
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    color: rgba(33, 31, 27, 0.6);
+  }
+
+  .pv-text {
+    font-weight: 300;
+    font-size: 11pt;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .pv-text.is-pinned {
+    font-weight: 400;
+  }
+
+  .pv-note {
+    margin: 3pt 0 0 43pt;
+    padding-left: 8pt;
+    border-left: 2pt solid rgba(60, 50, 30, 0.35);
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: rgba(33, 31, 27, 0.75);
+    white-space: pre-wrap;
+  }
+}

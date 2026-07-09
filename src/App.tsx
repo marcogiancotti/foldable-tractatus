@@ -5,7 +5,10 @@ import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
+import PrintView from './components/PrintView';
+import ReaderGuide from './components/ReaderGuide';
 import { copyText } from './lib/clipboard';
+import { downloadMarkdown, exportSelection, toMarkdown } from './lib/export';
 import { useKeyboardNav } from './lib/useKeyboardNav';
 import { useMediaQuery } from './lib/useMediaQuery';
 import { deriveDisplay } from './model/focusedView';
@@ -14,10 +17,12 @@ import { matchingStatements, ownCount } from './model/match';
 import { STATEMENTS } from './model/tree';
 import { StoreProvider, useStore } from './state/store';
 import { MAX_THREADS, useThreads } from './state/threads';
+import { useTheme } from './theme';
 
 function AppInner() {
   const { state, dispatch } = useStore();
   const threadsApi = useThreads();
+  const [theme, toggleTheme] = useTheme();
   const searchRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [confirmPinOnly, setConfirmPinOnly] = useState(false);
@@ -70,6 +75,17 @@ function AppInner() {
     const url = (qs ? `${location.pathname}?${qs}` : location.pathname) + location.hash;
     history.replaceState(null, '', url);
   }, [state.pins, state.overrides, state.activeTerm, state.activePath]);
+
+  const noteCount = Object.keys(state.notes).length;
+  const printEntries = useMemo(
+    () => exportSelection(state.pins, state.notes),
+    [state.pins, state.notes],
+  );
+  const exportMarkdown = () => {
+    downloadMarkdown(toMarkdown(printEntries, state.pins.size, noteCount));
+    dispatch({ type: 'toast', message: 'Markdown export downloaded' });
+  };
+  const exportPdf = () => window.print();
 
   const shareView = async () => {
     const ok = await copyText(location.href);
@@ -167,8 +183,8 @@ function AppInner() {
             onRedo={() => dispatch({ type: 'redo' })}
             onHelp={() => setHelpOpen(true)}
             onShare={shareView}
-            onExportMarkdown={() => {}}
-            onExportPdf={() => {}}
+            onExportMarkdown={exportMarkdown}
+            onExportPdf={exportPdf}
             presets={READING_PATHS}
             threads={threadsApi.threads}
             maxThreads={MAX_THREADS}
@@ -192,6 +208,8 @@ function AppInner() {
             termCount={termStats?.occurrences ?? 0}
             searchRef={searchRef}
             onOpenChange={setPanelOpen}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
           {term && termStats && (
             <TermCard
@@ -234,6 +252,8 @@ function AppInner() {
         onUndo={() => dispatch({ type: 'undo' })}
         onDismiss={() => dispatch({ type: 'dismissToast' })}
       />
+      <ReaderGuide open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />
       <ConfirmModal
         request={
           confirmPinOnly && term && termStats

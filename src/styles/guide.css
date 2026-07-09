@@ -1,0 +1,222 @@
+/* Reader guide — the help modal opened from the toolbar `help` icon or `?`.
+   Spec §12. Same overlay family as the confirm modal (paper surface,
+   hairline border, overlay shadow) but wider and internally scrollable,
+   with a sticky title bar. */
+
+.guide-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(33, 31, 27, 0.28);
+}
+
+:root[data-theme='dark'] .guide-scrim {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.guide-card {
+  width: 408px;
+  box-sizing: border-box;
+  max-height: 82vh;
+  overflow-y: auto;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  box-shadow: var(--shadow-overlay);
+  padding: 24px 28px 26px;
+  font-family: var(--font-body);
+}
+
+/* ---- sticky header ---- */
+
+.guide-head {
+  position: sticky;
+  top: -24px; /* cancels the card's own top padding so the bar pins flush */
+  z-index: 1;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0 16px;
+  margin: -24px 0 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.guide-title {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink100);
+  user-select: none;
+}
+
+.guide-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ink40);
+  transition: color 120ms ease;
+}
+
+.guide-close:hover {
+  color: var(--ink100);
+}
+
+.guide-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.guide-close .msym {
+  font-size: 20px;
+}
+
+/* ---- the controls (icon legend) ---- */
+
+.guide-icons-group {
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.guide-icons-title,
+.guide-kbd-heading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--ink100);
+  margin: 0 0 13px;
+  user-select: none;
+}
+
+.guide-kbd-heading {
+  margin-bottom: 15px;
+}
+
+.guide-icon-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 7px 0;
+}
+
+.guide-icon-chip {
+  flex: none;
+  width: 32px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--hover-surface);
+  border: 1px solid var(--hairline);
+}
+
+.guide-icon-glyph {
+  font-size: 20px;
+  color: var(--ink60);
+}
+
+.guide-icon-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.guide-icon-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink100);
+  line-height: 1.35;
+}
+
+.guide-icon-desc {
+  font-size: 13px;
+  color: var(--ink60);
+  line-height: 1.45;
+  margin-top: 1px;
+  text-wrap: pretty;
+}
+
+/* ---- keyboard shortcuts ---- */
+
+.guide-group {
+  margin-bottom: 20px;
+}
+
+.guide-group-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink40);
+  margin: 0 0 9px;
+  user-select: none;
+}
+
+.guide-row {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding: 5px 0;
+}
+
+.guide-keys {
+  flex: none;
+  width: 164px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 6px;
+}
+
+.guide-combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.guide-or {
+  font-size: 12px;
+  color: var(--ink40);
+}
+
+.guide-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ink100);
+  background: var(--hover-surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  user-select: none;
+}
+
+.guide-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--ink100);
+  line-height: 1.4;
+}

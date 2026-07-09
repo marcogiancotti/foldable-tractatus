@@ -3,6 +3,8 @@
 @import './panel.css';
 @import './overlays.css';
 @import './xref.css';
+@import './guide.css';
+@import './print.css';
 
 * {
   box-sizing: border-box;
