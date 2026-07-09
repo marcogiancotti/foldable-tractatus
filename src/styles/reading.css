@@ -156,3 +156,50 @@
   color: var(--ink100);
   text-wrap: pretty;
 }
+
+/* ---- peek range: the quietest element ---- */
+
+.peek-row {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  width: 100%;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms ease;
+}
+
+.peek-row:hover {
+  background: var(--hover-surface);
+}
+
+.peek-toggle {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: 1px 0 0 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(3.5px);
+  color: var(--ink40);
+  transition: color 120ms ease;
+}
+
+.peek-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.62;
+  color: var(--ink40);
+  user-select: none;
+  transition: color 120ms ease;
+}
+
+.peek-row:hover .peek-toggle,
+.peek-row:hover .peek-label {
+  color: var(--ink100);
+}

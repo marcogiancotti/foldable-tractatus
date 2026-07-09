@@ -1,11 +1,21 @@
+import type { DisplayItem } from '../model/focusedView';
 import { ROOT_IDS, STATEMENTS } from '../model/tree';
+import PeekRange from './PeekRange';
 import StatementRow from './StatementRow';
 
 interface Props {
+  display: DisplayItem[];
+  onToggle: (n: string, expand: boolean) => void;
+  onPromote: (members: string[]) => void;
   annotationCount?: number;
 }
 
-export default function ReadingColumn({ annotationCount = 0 }: Props) {
+export default function ReadingColumn({
+  display,
+  onToggle,
+  onPromote,
+  annotationCount = 0,
+}: Props) {
   return (
     <main className="reading-col">
       <header>
@@ -41,9 +51,25 @@ export default function ReadingColumn({ annotationCount = 0 }: Props) {
         <div className="rc-book-byline">Ludwig Wittgenstein, 1922 (Ogden translation)</div>
       </header>
       <section aria-label="Statements">
-        {STATEMENTS.map((s) => (
-          <StatementRow key={s.n} statement={s} expanded={s.children.length > 0} />
-        ))}
+        {display.map((item) =>
+          item.kind === 'row' ? (
+            <StatementRow
+              key={item.n}
+              n={item.n}
+              depth={item.depth}
+              state={item.state}
+              onToggle={onToggle}
+            />
+          ) : (
+            <PeekRange
+              key={`peek-${item.members[0]}`}
+              depth={item.depth}
+              members={item.members}
+              label={item.label}
+              onPromote={onPromote}
+            />
+          ),
+        )}
       </section>
     </main>
   );
