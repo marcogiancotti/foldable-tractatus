@@ -16,6 +16,7 @@ import {
   type Dispatch,
   type ReactNode,
 } from 'react';
+import { decodeViewState, statementParam } from '../model/urlState';
 import { loadNotes, saveNotes } from './persistence';
 import {
   foldAllOverrides,
@@ -61,7 +62,7 @@ export type AppAction =
   | { type: 'foldAll' }
   | { type: 'unfoldAll' }
   | { type: 'togglePin'; n: string }
-  | { type: 'isolate'; n: string }
+  | { type: 'isolate'; n: string; message?: string }
   | {
       type: 'applyPins';
       pins: string[];
@@ -147,7 +148,7 @@ export function reducer(s: AppState, a: AppAction): AppState {
         pins: new Set([a.n]),
         overrides: new Map(),
         activePath: null,
-        toast: makeToast(`Pinned only statement ${a.n}`, true),
+        toast: makeToast(a.message ?? `Pinned only statement ${a.n}`, true),
       });
 
     case 'applyPins': {
@@ -226,10 +227,14 @@ const StoreContext = createContext<{ state: AppState; dispatch: Dispatch<AppActi
 );
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState, (init) => ({
-    ...init,
-    notes: loadNotes(),
-  }));
+  const [state, dispatch] = useReducer(reducer, initialState, (init) => {
+    // Restore view state from the shareable link (spec §7); ?statement=N isolates.
+    const isolated = statementParam(location.search);
+    const view = isolated
+      ? { pins: new Set([isolated]), overrides: new Map<string, boolean>() }
+      : (decodeViewState(location.search) ?? {});
+    return { ...init, ...view, notes: loadNotes() };
+  });
   useEffect(() => saveNotes(state.notes), [state.notes]);
   return <StoreContext.Provider value={{ state, dispatch }}>{children}</StoreContext.Provider>;
 }

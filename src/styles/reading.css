@@ -392,6 +392,33 @@
   color: var(--ink60);
 }
 
+.row-share-btn {
+  flex: none;
+  align-self: baseline;
+  margin-left: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  transform: translateY(2.5px);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink24);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.row:hover .row-share-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.row-share-btn:hover {
+  color: var(--ink60);
+}
+
 /* ---- peek range: the quietest element ---- */
 
 .peek-row {

@@ -17,6 +17,7 @@ interface Props {
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
   onNavigate: (n: string) => void;
+  onShare: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
@@ -37,6 +38,7 @@ export default function ReadingColumn({
   onPin,
   onSelectTerm,
   onNavigate,
+  onShare,
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
@@ -96,6 +98,7 @@ export default function ReadingColumn({
               onPin={onPin}
               onSelectTerm={onSelectTerm}
               onNavigate={onNavigate}
+              onShare={onShare}
               onStartEditNote={onStartEditNote}
               onCommitNote={onCommitNote}
               onStopEditNote={onStopEditNote}

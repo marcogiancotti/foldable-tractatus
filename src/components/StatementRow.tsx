@@ -19,6 +19,7 @@ interface Props {
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
   onNavigate: (n: string) => void;
+  onShare: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
@@ -41,6 +42,7 @@ export default function StatementRow({
   onPin,
   onSelectTerm,
   onNavigate,
+  onShare,
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
@@ -100,6 +102,14 @@ export default function StatementRow({
             edit_note
           </button>
         )}
+        <button
+          className="row-share-btn msym"
+          aria-label={`Copy link to statement ${n} and pin only it`}
+          title="share link"
+          onClick={() => onShare(n)}
+        >
+          ios_share
+        </button>
         <button
           className={`row-pin msym ${pinned ? 'is-pinned' : ''}`}
           aria-label={pinned ? `Unpin statement ${n}` : `Pin statement ${n}`}

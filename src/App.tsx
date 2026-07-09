@@ -5,9 +5,11 @@ import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
+import { copyText } from './lib/clipboard';
 import { useKeyboardNav } from './lib/useKeyboardNav';
 import { useMediaQuery } from './lib/useMediaQuery';
 import { deriveDisplay } from './model/focusedView';
+import { encodeViewState, statementParam } from './model/urlState';
 import { matchingStatements, ownCount } from './model/match';
 import { STATEMENTS } from './model/tree';
 import { StoreProvider, useStore } from './state/store';
@@ -48,6 +50,46 @@ function AppInner() {
     }
     setPendingScroll(null);
   }, [pendingScroll, reducedMotion]);
+
+  // A ?statement=N deep link lands on the statement (store already isolated it).
+  useEffect(() => {
+    const n = statementParam(location.search);
+    if (n) setPendingScroll(n);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the link in sync with the view state (spec §7) — replaceState only,
+  // never pushState: in-app history stays off the browser Back button (§12).
+  useEffect(() => {
+    const qs = encodeViewState({
+      pins: state.pins,
+      overrides: state.overrides,
+      activeTerm: state.activeTerm,
+      activePath: state.activePath,
+    });
+    const url = (qs ? `${location.pathname}?${qs}` : location.pathname) + location.hash;
+    history.replaceState(null, '', url);
+  }, [state.pins, state.overrides, state.activeTerm, state.activePath]);
+
+  const shareView = async () => {
+    const ok = await copyText(location.href);
+    dispatch({
+      type: 'toast',
+      message: ok ? 'Link to this view copied to clipboard' : "Couldn't copy the link",
+    });
+  };
+
+  const shareStatement = async (n: string) => {
+    const link = `${location.origin}${location.pathname}?statement=${encodeURIComponent(n)}`;
+    const ok = await copyText(link);
+    dispatch({
+      type: 'isolate',
+      n,
+      message: ok
+        ? `Pinned only statement ${n} — link copied`
+        : `Pinned only statement ${n}`,
+    });
+  };
 
   useKeyboardNav({
     toggleRow: (n, expand) => dispatch({ type: 'toggleRow', n, expand }),
@@ -124,7 +166,7 @@ function AppInner() {
             onUndo={() => dispatch({ type: 'undo' })}
             onRedo={() => dispatch({ type: 'redo' })}
             onHelp={() => setHelpOpen(true)}
-            onShare={() => {}}
+            onShare={shareView}
             onExportMarkdown={() => {}}
             onExportPdf={() => {}}
             presets={READING_PATHS}
@@ -177,6 +219,7 @@ function AppInner() {
         onPin={(n) => dispatch({ type: 'togglePin', n })}
         onSelectTerm={(canonical) => dispatch({ type: 'setTerm', term: canonical })}
         onNavigate={navigateToStatement}
+        onShare={shareStatement}
         onStartEditNote={setEditingNote}
         onCommitNote={(n, text) => dispatch({ type: 'setNote', n, text })}
         onStopEditNote={() => {
