@@ -687,19 +687,17 @@
 
 /* ================= selected-term card ================= */
 
+/* Full width even when the panel is collapsed (the card right-aligns under
+   the 108px panel): narrower and the chip truncates and the close icon spills. */
 .term-card {
   width: 176px;
   box-sizing: border-box;
+  margin-top: 14px;
   background: var(--paper);
   border: 1px solid var(--hairline);
   border-radius: 5px;
   box-shadow: var(--shadow-overlay);
   padding: 14px 16px 15px;
-  transition: width 180ms ease;
-}
-
-.term-card.is-narrow {
-  width: 108px;
 }
 
 .term-card-head {
@@ -716,6 +714,7 @@
 }
 
 .term-chip {
+  min-width: 0; /* let the flex item shrink so the ellipsis can engage */
   font-size: 14px;
   color: var(--ink100);
   background: var(--accent-wash);

@@ -8,7 +8,6 @@ interface Props {
   term: string;
   occurrences: number;
   statementCount: number;
-  narrow: boolean; // panel collapsed → match its 108px width
   onClear: () => void;
   onPinOnly: () => void;
   onAddPins: () => void;
@@ -18,7 +17,6 @@ export default function TermCard({
   term,
   occurrences,
   statementCount,
-  narrow,
   onClear,
   onPinOnly,
   onAddPins,
@@ -27,7 +25,7 @@ export default function TermCard({
     `${occurrences} occurrence${occurrences === 1 ? '' : 's'}` +
     ` · ${statementCount} statement${statementCount === 1 ? '' : 's'}`;
   return (
-    <div className={`term-card${narrow ? ' is-narrow' : ''}`}>
+    <div className="term-card">
       <div className="term-card-head">
         <span className="term-sel-label">Selected:</span>
         <span className="term-chip">{term}</span>

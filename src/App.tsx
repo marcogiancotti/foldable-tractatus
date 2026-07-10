@@ -450,7 +450,6 @@ function AppInner() {
               term={term}
               occurrences={termStats.occurrences}
               statementCount={matchCount}
-              narrow={!panelOpen}
               onClear={() => setTerm('')}
               onPinOnly={() => setPendingConfirm({ kind: 'pinOnly' })}
               onAddPins={() => dispatch({ type: 'applyPins', pins: termStats.matches, mode: 'add' })}
