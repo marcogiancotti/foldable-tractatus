@@ -37,8 +37,11 @@ interface ControlPanelProps {
   termActive: boolean;
   termCount: number; // total occurrences, shown when termActive
   searchRef?: Ref<HTMLInputElement>;
-  /** notified when the panel collapses/opens (the term card matches its width) */
-  onOpenChange?: (open: boolean) => void;
+  /** Enter/Esc left the search box — the reader wants the keyboard back */
+  onSearchLeave?: () => void;
+  /** controlled by App so `/` can reopen a collapsed panel before focusing */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
   /** encrypted cloud save (spec §7); row hidden when the endpoint isn't configured */
@@ -81,18 +84,22 @@ export default function ControlPanel({
   termActive,
   termCount,
   searchRef,
+  onSearchLeave,
+  open,
   onOpenChange,
   theme,
   onToggleTheme,
   onSaveToLink,
 }: ControlPanelProps) {
-  const [open, setOpen] = useState(true);
-  const toggleOpen = () => {
-    const next = !open;
-    setOpen(next);
-    onOpenChange?.(next);
-  };
+  const toggleOpen = () => onOpenChange(!open);
   const [searchFocused, setSearchFocused] = useState(false);
+  // Enter/Esc "dismisses" the search line: it drops to its resting look
+  // (grey underline, no clear/count) while the query — and the active term —
+  // stay. Focusing or editing the box re-engages it.
+  const [searchDismissed, setSearchDismissed] = useState(false);
+  useEffect(() => {
+    setSearchDismissed(false);
+  }, [searchValue]);
   const [threadsOpen, setThreadsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -132,8 +139,9 @@ export default function ControlPanel({
     },
   ];
 
-  const searchActive = searchFocused || termActive;
-  const showKbdHint = !termActive && !searchFocused;
+  const termShown = termActive && !searchDismissed;
+  const searchActive = searchFocused || termShown;
+  const showKbdHint = !searchFocused && !termShown;
   const elevated = threadsOpen || exportOpen;
 
   return (
@@ -172,15 +180,27 @@ export default function ControlPanel({
             placeholder="Search the text"
             aria-label="Search the text"
             onChange={(e) => onSearchChange(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
+            onFocus={() => {
+              setSearchFocused(true);
+              setSearchDismissed(false);
+            }}
             onBlur={() => setSearchFocused(false)}
+            onKeyDown={(e) => {
+              // hand the keyboard back to text navigation; the query stays
+              if (e.key === 'Enter' || e.key === 'Escape') {
+                e.preventDefault();
+                setSearchDismissed(true);
+                e.currentTarget.blur();
+                onSearchLeave?.();
+              }
+            }}
           />
           {showKbdHint && (
             <span className="cp-search-kbd" aria-hidden="true">
               /
             </span>
           )}
-          {termActive && (
+          {termShown && (
             <>
               <span className="cp-search-count">{termCount}</span>
               <button

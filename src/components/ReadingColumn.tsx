@@ -63,7 +63,7 @@ export default function ReadingColumn({
     if (!marginMode) {
       for (const w of wraps()) {
         w.style.top = '';
-        w.classList.remove('is-displaced', 'is-overflowing');
+        w.classList.remove('is-overflowing');
       }
       return;
     }
@@ -83,7 +83,6 @@ export default function ReadingColumn({
       const tops = computeNoteTops(anchors, heights, GAP, activeIdx >= 0 ? activeIdx : null);
       ws.forEach((w, i) => {
         w.style.top = `${tops[i] - groups[i].offsetTop}px`;
-        w.classList.toggle('is-displaced', Math.abs(tops[i] - anchors[i]) > 1);
         const clamped = w.querySelector<HTMLElement>('.note-clamp');
         w.classList.toggle(
           'is-overflowing',

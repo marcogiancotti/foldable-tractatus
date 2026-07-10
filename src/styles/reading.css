@@ -331,19 +331,15 @@
   overflow: hidden;
 }
 
-/* statement number, shown only while the note sits away from its row */
+/* the note's statement number — every margin note wears one */
 .note-num {
-  display: none;
+  display: block;
   font-family: var(--font-mono);
   font-size: 10.5px;
   line-height: 1;
   color: var(--ink40);
   margin-bottom: 3px;
   user-select: none;
-}
-
-.note-wrap.is-displaced .note-num {
-  display: block;
 }
 
 /* quiet hint, shown only when the clamp actually cuts text */

@@ -114,10 +114,9 @@ export default function AnnotationNote({
           }}
         >
           {/* Margin notes rest clamped to a few lines and never overlap (§6);
-              the number label shows only while the note sits away from its
-              statement (.is-displaced), the "more" hint only when the clamp
-              actually cuts text (.is-overflowing) — both set by the layout
-              pass in ReadingColumn. */}
+              each wears its statement number, and the "more" hint shows only
+              when the clamp actually cuts text (.is-overflowing, set by the
+              layout pass in ReadingColumn). */}
           <span className="note-main">
             {marginMode && (
               <span className="note-num" aria-hidden="true">

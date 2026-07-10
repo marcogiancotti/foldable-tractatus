@@ -28,7 +28,7 @@ interface ShortcutGroup {
 const ICON_LEGEND: IconLegendRow[] = [
   { icon: 'unfold_less', name: 'Fold all', desc: 'Collapse every branch back to the seven root propositions.' },
   { icon: 'unfold_more', name: 'Unfold all', desc: 'Expand the whole tree down to its leaves.' },
-  { icon: 'undo', name: 'Undo', desc: 'Step back through fold, pin, isolate and annotation actions.' },
+  { icon: 'undo', name: 'Undo', desc: 'Step back through fold, pin and annotation actions.' },
   { icon: 'redo', name: 'Redo', desc: 'Reapply an action you just undid.' },
 ];
 
@@ -62,7 +62,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     title: 'General',
     rows: [
-      { combos: [['/']], joiner: 'or', label: 'Search the text' },
+      { combos: [['/']], joiner: 'or', label: 'Search the text (Enter/Esc leaves the box)' },
       { combos: [['Ctrl', 'Z'], ['⌘', 'Z']], joiner: 'or', label: 'Undo' },
       { combos: [['Ctrl', 'Y'], ['⌘', 'Y']], joiner: 'or', label: 'Redo' },
       { combos: [['Esc']], joiner: 'or', label: 'Clear selection or close' },

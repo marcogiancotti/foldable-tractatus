@@ -48,6 +48,13 @@ function AppInner() {
   const [theme, toggleTheme] = useTheme();
   const searchRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(true);
+  // `/` must work with the panel collapsed: open it first, focus after render.
+  const [searchFocusPending, setSearchFocusPending] = useState(false);
+  useEffect(() => {
+    if (!searchFocusPending) return;
+    searchRef.current?.focus();
+    setSearchFocusPending(false);
+  }, [searchFocusPending]);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
@@ -195,7 +202,10 @@ function AppInner() {
     promotePeeks: (members) => dispatch({ type: 'promotePeeks', members }),
     togglePin: (n) => dispatch({ type: 'togglePin', n }),
     editNote: (n) => setEditingNote(n),
-    focusSearch: () => searchRef.current?.focus(),
+    focusSearch: () => {
+      setPanelOpen(true);
+      setSearchFocusPending(true);
+    },
     openHelp: () => setHelpOpen(true),
     escape: () => {
       if (helpOpen) setHelpOpen(false);
@@ -426,6 +436,10 @@ function AppInner() {
             termActive={term !== null}
             termCount={termStats?.occurrences ?? 0}
             searchRef={searchRef}
+            onSearchLeave={() =>
+              document.querySelector<HTMLElement>('[data-nav]')?.focus()
+            }
+            open={panelOpen}
             onOpenChange={setPanelOpen}
             theme={theme}
             onToggleTheme={toggleTheme}

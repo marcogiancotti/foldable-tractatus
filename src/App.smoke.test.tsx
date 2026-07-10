@@ -210,6 +210,37 @@ describe('app smoke', () => {
     expect(container.querySelector('.note-text')?.textContent).toBe('picture theory note');
   });
 
+  it('Enter/Esc leave the search box looking inactive and focus the first statement', async () => {
+    const search = () => container.querySelector<HTMLInputElement>('.cp-search-input')!;
+    await act(async () => search().focus());
+    await type(search(), 'picture');
+    expect(container.querySelector('.cp-search-line')!.className).toContain('is-active');
+
+    await press(search(), 'Enter');
+    // resting look: no accent underline, no clear button — but the query stays
+    expect(container.querySelector('.cp-search-line')!.className).not.toContain('is-active');
+    expect(container.querySelector('.cp-search-close')).toBeNull();
+    expect(search().value).toBe('picture');
+    // and the keyboard is handed to the text: first statement holds focus
+    expect(document.activeElement).toBe(container.querySelector('[data-nav]'));
+
+    await act(async () => search().focus());
+    expect(container.querySelector('.cp-search-line')!.className).toContain('is-active');
+    await press(search(), 'Escape');
+    expect(container.querySelector('.cp-search-line')!.className).not.toContain('is-active');
+    expect(search().value).toBe('picture');
+    expect(document.activeElement).toBe(container.querySelector('[data-nav]'));
+  });
+
+  it('the / shortcut reopens a collapsed panel and focuses the search box', async () => {
+    await click(container.querySelector('.cp-head')); // collapse the panel
+    expect(container.querySelector('.cp-head.is-open')).toBeNull();
+
+    await press(document.body, '/');
+    expect(container.querySelector('.cp-head.is-open')).not.toBeNull();
+    expect(document.activeElement).toBe(container.querySelector('.cp-search-input'));
+  });
+
   it('share copies a statement deep link without touching the local pins', async () => {
     const copied: string[] = [];
     Object.defineProperty(navigator, 'clipboard', {
