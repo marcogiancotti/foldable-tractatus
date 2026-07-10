@@ -64,7 +64,6 @@ export type AppAction =
   | { type: 'unfoldAll' }
   | { type: 'togglePin'; n: string }
   | { type: 'clearPins' }
-  | { type: 'isolate'; n: string; message?: string }
   | {
       type: 'applyPins';
       pins: string[];
@@ -157,14 +156,6 @@ export function reducer(s: AppState, a: AppAction): AppState {
         toast: makeToast('All pins removed', true),
       });
     }
-
-    case 'isolate':
-      return withHistory(s, {
-        pins: new Set([a.n]),
-        overrides: new Map(),
-        activePath: null,
-        toast: makeToast(a.message ?? `Pinned only statement ${a.n}`, true),
-      });
 
     case 'applyPins': {
       if (a.mode === 'replace') {

@@ -210,6 +210,26 @@ describe('app smoke', () => {
     expect(container.querySelector('.note-text')?.textContent).toBe('picture theory note');
   });
 
+  it('share copies a statement deep link without touching the local pins', async () => {
+    const copied: string[] = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (t: string) => void copied.push(t) },
+    });
+    await click(container.querySelector('[data-n="1"] .row-pin'));
+    expect(decodeURIComponent(location.search)).toBe('?p=1');
+
+    await click(container.querySelector('[data-n="2"] .row-share-btn'));
+    expect(copied).toHaveLength(1);
+    expect(copied[0]).toContain('?statement=2');
+    expect(container.querySelector('.toast-wrap')?.textContent).toContain(
+      'Link to statement 2 copied',
+    );
+    // local state is untouched: same pins, same URL, share isn't undoable
+    expect(decodeURIComponent(location.search)).toBe('?p=1');
+    expect(container.querySelector('[data-n="2"] .row-pin')?.className).not.toContain('is-pinned');
+  });
+
   it('caps notes at 1,000 characters', async () => {
     await click(container.querySelector('[aria-label="Add note to statement 1"]'));
     await type(container.querySelector('.note-input'), 'x'.repeat(1100));

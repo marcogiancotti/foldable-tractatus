@@ -179,15 +179,13 @@ function AppInner() {
     });
   };
 
+  // Copies a deep link only — the local view must not change (spec §12).
   const shareStatement = async (n: string) => {
     const link = `${location.origin}${location.pathname}?statement=${encodeURIComponent(n)}`;
     const ok = await copyText(link);
     dispatch({
-      type: 'isolate',
-      n,
-      message: ok
-        ? `Pinned only statement ${n} — link copied`
-        : `Pinned only statement ${n}`,
+      type: 'toast',
+      message: ok ? `Link to statement ${n} copied` : "Couldn't copy the link",
     });
   };
 

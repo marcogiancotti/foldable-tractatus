@@ -29,10 +29,10 @@ The reading experience is one of **controlled disclosure**: the reader opens onl
 - **Global controls:** *Fold all* and *Unfold all* act on the whole tree (Fold all interacts with pins — see Section 5).
 - **No level-skipping:** a descendant is never shown without its full chain of ancestors also being present. The hierarchy is always legible.
 
-## 4. Pinning and isolating
+## 4. Pinning and sharing a statement
 
 - Each statement has a **pin** control. Pinning marks a statement as personally significant.
-- Each statement also has an **isolate** ("focus on this only") control: it makes that statement the sole pinned statement, replacing any existing pins. This is the same mechanism used for deep-linking (Section 12). Because it is a pin-replacing action, it is a single, clearly-undoable step (Section 12).
+- Each statement also has a **share** control: it copies that statement's deep link (Section 12) to the clipboard, confirmed by a toast. It is for handing a single statement to someone else and **never alters the sharer's own view** — no pins change, nothing folds, nothing enters the undo history. Only the *recipient* opening the link gets the isolated view.
 - Pins are the backbone of focused reading, sharing, export, and reading paths.
 - The reading column's information line reports the **number of pinned statements** (alongside the statement and branch counts) whenever anything is pinned, in the same accent treatment as the annotation count — the reader's own marks stand apart from the fixed text's numbers.
 - A prominent **"unpin all"** action clears the entire pin set. Because it destroys a possibly carefully-built pin set, it asks for confirmation first, with the same brief warning-and-confirm treatment as the other pin-replacing actions — and, like them, it is a single, clearly-undoable step (Section 12). Manual expansion survives it; only the pins go.
@@ -123,9 +123,9 @@ _(Removed: styled-HTML export — PDF covers the print/read-outside case more co
 
 ## 12. Navigation and history
 
-- **Deep-linkable statements:** every statement is individually addressable by a link that isolates it (Section 4) and scrolls it into view.
+- **Deep-linkable statements:** every statement is individually addressable by a link that, when opened, pins that statement alone and scrolls it into view. The link is obtained from the statement's share control (Section 4) without disturbing the sharer's own state.
 - **Keyboard navigation:** move between statements with the arrow keys (and also j/k for readers who prefer them), with keys for expand/fold and pin.
-- **Undo / redo:** the app keeps its own in-app history of actions (fold, pin, isolate, "Pin only these", annotate, apply reading path), traversable with undo/redo. It is **not** wired to the browser Back button, so navigation is never hijacked and history is never flooded. Native text-editing undo inside an annotation field works as usual. **Pin-replacing actions (isolate, "Pin only these", applying a reading path or saved thread, unpin all) are single undoable steps** and surface an immediate undo affordance so an accidental replacement is trivially reversible. At minimum, the reader can always recover prior states within a session.
+- **Undo / redo:** the app keeps its own in-app history of actions (fold, pin, "Pin only these", annotate, apply reading path), traversable with undo/redo. It is **not** wired to the browser Back button, so navigation is never hijacked and history is never flooded. Native text-editing undo inside an annotation field works as usual. **Pin-replacing actions ("Pin only these", applying a reading path or saved thread, unpin all) are single undoable steps** and surface an immediate undo affordance so an accidental replacement is trivially reversible. At minimum, the reader can always recover prior states within a session.
 
 ## 13. State summary
 

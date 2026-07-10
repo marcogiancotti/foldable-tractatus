@@ -104,7 +104,7 @@ export default function StatementRow({
         )}
         <button
           className="row-share-btn msym"
-          aria-label={`Copy link to statement ${n} and pin only it`}
+          aria-label={`Copy link to statement ${n}`}
           title="share link"
           onClick={() => onShare(n)}
         >
