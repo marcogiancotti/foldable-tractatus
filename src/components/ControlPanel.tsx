@@ -279,20 +279,20 @@ export default function ControlPanel({
                 <span className="cp-share-icon msym" aria-hidden="true">
                   link
                 </span>
-                <span className="cp-share-label">Share</span>
+                <span className="cp-share-label">Share pins only</span>
               </button>
 
               {onSaveToLink && (
                 <button
                   type="button"
                   className="cp-share-row"
-                  title="save encrypted notes under a private link"
+                  title="copy a link carrying your pins and notes"
                   onClick={onSaveToLink}
                 >
                   <span className="cp-share-icon msym" aria-hidden="true">
-                    cloud_upload
+                    link
                   </span>
-                  <span className="cp-share-label">Save notes to link</span>
+                  <span className="cp-share-label">Share pins & notes</span>
                 </button>
               )}
               <button

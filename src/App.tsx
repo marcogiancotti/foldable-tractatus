@@ -282,12 +282,12 @@ function AppInner() {
         const notes = Object.keys(pendingConfirm.payload.notes).length;
         const pins = pendingConfirm.payload.pins.length;
         return {
-          title: 'Load notes from this link?',
+          title: 'Load shared pins and notes?',
           body:
-            `This link holds ${notes} annotation${notes === 1 ? '' : 's'} and ` +
-            `${pins} pin${pins === 1 ? '' : 's'}. ` +
+            `Someone shared ${notes} annotation${notes === 1 ? '' : 's'} and ` +
+            `${pins} pin${pins === 1 ? '' : 's'} with you. ` +
             'Loading them replaces your current annotations and pins. This is undoable.',
-          confirmLabel: 'Load notes',
+          confirmLabel: 'Load',
         };
       }
       case 'pinOnly':

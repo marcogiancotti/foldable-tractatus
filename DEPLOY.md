@@ -1,7 +1,7 @@
 # Deploying the Foldable Tractatus
 
 Two independent pieces: a static frontend (Vercel) and an optional tiny backend
-(Val Town free plan) for the encrypted "Save notes to link" feature. The app is
+(Val Town free plan) for the encrypted "Share pins & notes" feature. The app is
 fully functional without the backend — the sync row simply doesn't appear.
 
 > **Status:** the backend is live at `https://tractatus-notes.val.run`
