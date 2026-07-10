@@ -123,16 +123,18 @@ export default function ReadingColumn({
           <span>{STATEMENTS.length} statements</span>
           <span className="rc-meta-sep">/</span>
           <span>{ROOT_IDS.length} branches</span>
-          {pins.size > 1 && (
+          {pins.size > 0 && (
             <>
               <span className="rc-meta-sep">/</span>
-              <span>{pins.size} pins</span>
+              <span className="rc-meta-accent">
+                {pins.size} pin{pins.size === 1 ? '' : 's'}
+              </span>
             </>
           )}
           {annotationCount > 0 && (
             <>
               <span className="rc-meta-sep">/</span>
-              <span className="rc-meta-notes">
+              <span className="rc-meta-accent">
                 {annotationCount} annotation{annotationCount === 1 ? '' : 's'}
               </span>
             </>

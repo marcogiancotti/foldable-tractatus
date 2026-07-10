@@ -34,7 +34,7 @@ The reading experience is one of **controlled disclosure**: the reader opens onl
 - Each statement has a **pin** control. Pinning marks a statement as personally significant.
 - Each statement also has an **isolate** ("focus on this only") control: it makes that statement the sole pinned statement, replacing any existing pins. This is the same mechanism used for deep-linking (Section 12). Because it is a pin-replacing action, it is a single, clearly-undoable step (Section 12).
 - Pins are the backbone of focused reading, sharing, export, and reading paths.
-- The reading column's information line reports the **number of pinned statements** (alongside the statement and branch counts) whenever more than one statement is pinned.
+- The reading column's information line reports the **number of pinned statements** (alongside the statement and branch counts) whenever anything is pinned, in the same accent treatment as the annotation count — the reader's own marks stand apart from the fixed text's numbers.
 - A prominent **"unpin all"** action clears the entire pin set. Because it destroys a possibly carefully-built pin set, it asks for confirmation first, with the same brief warning-and-confirm treatment as the other pin-replacing actions — and, like them, it is a single, clearly-undoable step (Section 12). Manual expansion survives it; only the pins go.
 
 ## 5. Focused reading (the folded-with-pins view)

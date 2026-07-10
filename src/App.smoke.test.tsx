@@ -162,11 +162,12 @@ describe('app smoke', () => {
     expect(container.querySelector('.toast-wrap')?.textContent).toContain('Thread "Alpha" deleted');
   });
 
-  it('shows the pin count in the info line only past one pin', async () => {
+  it('shows the pin count in the info line, singular and plural', async () => {
     const meta = () => container.querySelector('.rc-meta')!.textContent!;
-    expect(meta()).not.toContain('pins');
+    expect(meta()).not.toContain('pin');
     await click(container.querySelector('[data-n="1"] .row-pin'));
-    expect(meta()).not.toContain('pins');
+    expect(meta()).toContain('1 pin');
+    expect(meta()).not.toContain('1 pins');
     await click(container.querySelector('[data-n="2"] .row-pin'));
     expect(meta()).toContain('2 pins');
   });

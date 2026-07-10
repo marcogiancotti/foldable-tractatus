@@ -41,7 +41,8 @@
   color: var(--ink24);
 }
 
-.rc-meta-notes {
+/* the reader's own contributions (pins, annotations) read in the accent */
+.rc-meta-accent {
   color: var(--accent);
 }
 
