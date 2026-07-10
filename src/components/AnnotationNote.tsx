@@ -17,6 +17,7 @@ interface Props {
   onStartEdit: () => void;
   onCommit: (text: string) => void;
   onStopEdit: () => void;
+  onDelete: () => void; // the parent confirms before anything is removed
 }
 
 const AUTOSAVE_DEBOUNCE = 600;
@@ -30,6 +31,7 @@ export default function AnnotationNote({
   onStartEdit,
   onCommit,
   onStopEdit,
+  onDelete,
 }: Props) {
   const [draft, setDraft] = useState(text);
   const areaRef = useRef<HTMLTextAreaElement>(null);
@@ -95,8 +97,22 @@ export default function AnnotationNote({
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
-          <div className="note-meta">
-            autosaved · {(NOTE_LIMIT - draft.length).toLocaleString()} left
+          <div className="note-edit-foot">
+            <div className="note-meta">
+              autosaved · {(NOTE_LIMIT - draft.length).toLocaleString()} left
+            </div>
+            <button
+              type="button"
+              className="note-trash msym"
+              aria-label={`Delete note on statement ${n}`}
+              title="delete note"
+              // keep the textarea focused: blur would commit and close the
+              // editor on mousedown, before this click ever landed
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onDelete}
+            >
+              delete
+            </button>
           </div>
         </div>
       ) : (

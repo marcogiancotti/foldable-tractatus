@@ -9,6 +9,9 @@
   (the design prototype encoded these inline as [[N]] tokens; here they are
   structured). NOTE: this subset's refs are the prototype's demo set, to be
   replaced with the real citations when the full text lands.
+
+  Mathematical notation is authored as inline `$…$` LaTeX (typeset by KaTeX
+  at render time) — the convention the full-text import follows.
 */
 
 export interface StatementSource {
@@ -81,6 +84,6 @@ export const TRACTATUS: StatementSource[] = [
   },
   { n: '4', text: 'The thought is the significant proposition.' },
   { n: '5', text: 'Propositions are truth-functions of elementary propositions.' },
-  { n: '6', text: 'The general form of truth-function is [p̄, ξ̄, N(ξ̄)].' },
+  { n: '6', text: 'The general form of truth-function is $[\\bar p, \\bar \\xi, N(\\bar \\xi)]$.' },
   { n: '7', text: 'Whereof one cannot speak, thereof one must be silent.' },
 ];

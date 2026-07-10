@@ -18,6 +18,7 @@ The reading experience is one of **controlled disclosure**: the reader opens onl
 
 - The public-domain **C. K. Ogden (1922) English translation** is the sole text, in English only.
 - Preparing the text is a build-time task: obtaining a cleanly-formatted copy and encoding it as the fixed statement tree (each statement carries its decimal id, its text, and its parent).
+- **Mathematical notation** in statement text is authored as inline `$…$` LaTeX and rendered typeset (KaTeX) wherever the text appears — reading column, cross-reference previews, print view. Math never participates in term marking or search counts, and exports keep the raw LaTeX (the standard math-in-Markdown convention). Annotations are unaffected: they stay plain text (Section 6).
 - A **curated term index** (Section 9) is also a build-time deliverable derived from a careful reading of the text — it is authored, not generated at runtime.
 
 ## 3. Core reading model — the foldable tree
@@ -64,6 +65,7 @@ Crucially, peeks are **computed, not managed** — the reader never sets them. T
 - The reader can attach a personal **annotation** to any statement, and edit or delete it.
 - **Plain text only.** Annotations are never parsed, interpreted, or rendered as markup (no Markdown, no HTML, no rich text). They are stored as text and displayed as text — inserted as text content, never as markup — so there is **no rendering step and no injection surface**, even for annotations that arrive in an imported or synced bundle. Line breaks are preserved, so multi-paragraph notes still read cleanly.
 - **No edit/save flow.** There is a single text field; changes **autosave automatically after a short debounce** as the reader types. There is no separate display mode and no explicit Save action. **Enter closes the editor** (the note is already saved); **Shift+Enter inserts a line break**.
+- **Deletion** is an explicit control at the bottom of the open note editor (a trash icon). It asks for confirmation, and — like any annotation change — is a single undoable step.
 - **Length cap:** annotations are bounded, not unbounded. Cap: **1,000 characters** per annotation (about 150–175 words). Remaining budget is shown as the reader approaches it.
 - **Margin notes never overlap.** When notes crowd each other (folding often brings annotated statements close together), a long note rests folded to its first few lines, and notes slide down just enough that none covers another. Opening a note (click, or editing it) expands it in place while its neighbours make room — nothing is ever occluded. Every margin note is labelled with its statement's number, so the pairing stays legible even when a note has slid away from its row.
 - Annotations are private study notes. They persist locally between sessions automatically, and are **never** carried in the shareable link (Section 7).

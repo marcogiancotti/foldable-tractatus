@@ -4,6 +4,7 @@
 */
 
 import { curatedTermFor } from '../data/terms';
+import { stripMath } from '../lib/math';
 import { statement } from './tree';
 
 export function escapeRegExp(s: string): string {
@@ -27,7 +28,8 @@ export function termRegex(term: string): RegExp | null {
 
 export function countInText(text: string, term: string): number {
   const re = termRegex(term);
-  return re ? (text.match(re)?.length ?? 0) : 0;
+  // prose only: $…$ LaTeX source (\bar, \xi, …) must never count as words
+  return re ? (stripMath(text).match(re)?.length ?? 0) : 0;
 }
 
 /** Occurrences in one statement's own text. */

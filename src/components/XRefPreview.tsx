@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { statement } from '../model/tree';
+import MathText from './MathText';
 
 interface XRefsProps {
   refs: string[];
@@ -75,7 +76,9 @@ export default function XRefPreview({ refs, onNavigate }: XRefsProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="xref-pop-num">{node.n}</div>
-                <div className="xref-pop-text">{node.text}</div>
+                <div className="xref-pop-text">
+                  <MathText text={node.text} />
+                </div>
                 <div className="xref-pop-sep" />
                 <button
                   type="button"

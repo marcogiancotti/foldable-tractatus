@@ -5,6 +5,7 @@
 */
 
 import type { ExportEntry } from '../lib/export';
+import MathText from './MathText';
 
 interface Props {
   entries: ExportEntry[];
@@ -28,7 +29,9 @@ export default function PrintView({ entries, pinCount, noteCount }: Props) {
         <div key={s.n} className="pv-entry" style={{ marginLeft: s.depth * 24 }}>
           <div className="pv-row">
             <span className="pv-num">{s.n}</span>
-            <span className={`pv-text${pinned ? ' is-pinned' : ''}`}>{s.text}</span>
+            <span className={`pv-text${pinned ? ' is-pinned' : ''}`}>
+              <MathText text={s.text} />
+            </span>
           </div>
           {note !== undefined && <div className="pv-note">{note}</div>}
         </div>

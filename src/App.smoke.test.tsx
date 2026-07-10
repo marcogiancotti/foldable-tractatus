@@ -261,6 +261,38 @@ describe('app smoke', () => {
     expect(container.querySelector('[data-n="2"] .row-pin')?.className).not.toContain('is-pinned');
   });
 
+  it('typesets $…$ math in statement text via KaTeX', () => {
+    const row = container.querySelector('[data-n="6"] .row-text')!;
+    expect(row.querySelector('.math .katex')).not.toBeNull();
+    expect(row.textContent).not.toContain('$');
+    // the visible layer is typeset (raw \bar source lives only in the
+    // aria/MathML fallback KaTeX emits alongside it)
+    expect(row.querySelector('.katex-html')!.textContent).not.toContain('\\bar');
+  });
+
+  it('deletes a note from the editor trash, behind a confirm, undoably', async () => {
+    await click(container.querySelector('[aria-label="Add note to statement 3"]'));
+    await type(container.querySelector('.note-input'), 'doomed note');
+    await press(container.querySelector('.note-input'), 'Enter');
+    expect(container.querySelector('.note-text')?.textContent).toBe('doomed note');
+
+    // reopen the editor; cancel keeps the note
+    await click(container.querySelector('.note-box'));
+    await click(container.querySelector('[aria-label="Delete note on statement 3"]'));
+    expect(document.body.textContent).toContain('Delete this note?');
+    await click(container.querySelector('.modal-cancel'));
+    expect(container.querySelector('.note-text')?.textContent).toBe('doomed note');
+
+    // confirm deletes, with a toast; undo brings the note back
+    await click(container.querySelector('.note-box'));
+    await click(container.querySelector('[aria-label="Delete note on statement 3"]'));
+    await click(container.querySelector('.modal-confirm'));
+    expect(container.querySelector('.note-text')).toBeNull();
+    expect(container.querySelector('.toast-wrap')?.textContent).toContain('Note on 3 deleted');
+    await click(container.querySelector('[aria-label="undo"]'));
+    expect(container.querySelector('.note-text')?.textContent).toBe('doomed note');
+  });
+
   it('caps notes at 1,000 characters', async () => {
     await click(container.querySelector('[aria-label="Add note to statement 1"]'));
     await type(container.querySelector('.note-input'), 'x'.repeat(1100));

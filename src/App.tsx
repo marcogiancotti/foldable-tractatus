@@ -40,7 +40,8 @@ type PendingConfirm =
   | { kind: 'pinOnly' }
   | { kind: 'applySet'; source: 'path' | 'thread'; pins: string[]; name: string; pathId?: string }
   | { kind: 'unpinAll' }
-  | { kind: 'deleteThread'; id: string; name: string; pins: number };
+  | { kind: 'deleteThread'; id: string; name: string; pins: number }
+  | { kind: 'deleteNote'; n: string };
 
 function AppInner() {
   const { state, dispatch } = useStore();
@@ -329,6 +330,12 @@ function AppInner() {
           confirmLabel: 'Yes',
         };
       }
+      case 'deleteNote':
+        return {
+          title: 'Delete this note?',
+          body: `The note on statement ${pendingConfirm.n} will be removed. This is undoable.`,
+          confirmLabel: 'Yes',
+        };
     }
   })();
 
@@ -359,6 +366,12 @@ function AppInner() {
       case 'deleteThread':
         threadsApi.remove(pendingConfirm.id);
         dispatch({ type: 'toast', message: `Thread "${pendingConfirm.name}" deleted` });
+        break;
+      case 'deleteNote':
+        // empty text deletes the key (store); its own undo step — the modal
+        // stole focus, so the editor already blurred and ended its edit run
+        dispatch({ type: 'setNote', n: pendingConfirm.n, text: '' });
+        dispatch({ type: 'toast', message: `Note on ${pendingConfirm.n} deleted` });
         break;
     }
     setPendingConfirm(null);
@@ -477,6 +490,7 @@ function AppInner() {
           setEditingNote(null);
           dispatch({ type: 'endNoteEdit' });
         }}
+        onDeleteNote={(n) => setPendingConfirm({ kind: 'deleteNote', n })}
         firstRowRef={firstRowRef}
       />
       <div className="note-rail" aria-hidden="true" />

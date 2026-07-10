@@ -2,6 +2,8 @@
   Study export (spec §8): the pinned statements with their ancestor lineage,
   plus ALL annotations (including on non-pinned statements), in reading order.
   Markdown structure comes from the statements; annotations are plain text.
+  Statement text keeps its raw `$…$` LaTeX — the standard math-in-Markdown
+  convention, typeset by most viewers.
 */
 
 import { pinAncestorSet, type Pins } from '../model/focusedView';

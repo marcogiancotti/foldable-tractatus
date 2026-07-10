@@ -1,12 +1,16 @@
 /*
   Statement text pipeline (spec §9/§9a): curated terms are marked inline and
   clickable; every word matching the active term gets the accent-wash highlight.
-  Text is always rendered as text content — never markup.
+  Text is always rendered as text content — never markup — except `$…$` math
+  segments, which are curated data typeset by KaTeX (see MathText) and are
+  excluded from term marking.
 */
 
 import { useMemo } from 'react';
 import { CURATED_TERMS } from '../data/terms';
+import { splitMath } from '../lib/math';
 import { escapeRegExp, termRegex } from '../model/match';
+import { MathSpan } from './MathText';
 
 interface Props {
   text: string;
@@ -55,34 +59,47 @@ function tokenize(text: string, activeTerm: string | null): Token[] {
 }
 
 export default function StatementText({ text, activeTerm, onSelectTerm }: Props) {
-  const tokens = useMemo(() => tokenize(text, activeTerm), [text, activeTerm]);
+  const segments = useMemo(
+    () =>
+      splitMath(text).map((seg) => ({
+        ...seg,
+        tokens: seg.math ? [] : tokenize(seg.value, activeTerm),
+      })),
+    [text, activeTerm],
+  );
   return (
     <>
-      {tokens.map((t, i) => {
-        if (t.canonical) {
-          return (
-            <button
-              key={i}
-              className={`idx-term ${t.hit ? 'is-hit' : ''}`}
-              title={`trace "${t.canonical}"`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectTerm(t.canonical!);
-              }}
-            >
-              {t.text}
-            </button>
-          );
-        }
-        if (t.hit) {
-          return (
-            <span key={i} className="term-hit">
-              {t.text}
-            </span>
-          );
-        }
-        return t.text;
-      })}
+      {segments.map((seg, si) =>
+        seg.math ? (
+          <MathSpan key={si} latex={seg.value} />
+        ) : (
+          seg.tokens.map((t, i) => {
+            if (t.canonical) {
+              return (
+                <button
+                  key={`${si}-${i}`}
+                  className={`idx-term ${t.hit ? 'is-hit' : ''}`}
+                  title={`trace "${t.canonical}"`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectTerm(t.canonical!);
+                  }}
+                >
+                  {t.text}
+                </button>
+              );
+            }
+            if (t.hit) {
+              return (
+                <span key={`${si}-${i}`} className="term-hit">
+                  {t.text}
+                </span>
+              );
+            }
+            return t.text;
+          })
+        ),
+      )}
     </>
   );
 }

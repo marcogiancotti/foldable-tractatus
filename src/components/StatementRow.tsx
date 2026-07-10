@@ -23,6 +23,7 @@ interface Props {
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
+  onDeleteNote: (n: string) => void;
 }
 
 const INDENT_BASE = 4;
@@ -46,6 +47,7 @@ export default function StatementRow({
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
+  onDeleteNote,
 }: Props) {
   const s = statement(n);
   const hasChildren = s.children.length > 0;
@@ -130,6 +132,7 @@ export default function StatementRow({
           onStartEdit={() => onStartEditNote(n)}
           onCommit={(text) => onCommitNote(n, text)}
           onStopEdit={onStopEditNote}
+          onDelete={() => onDeleteNote(n)}
         />
       )}
     </div>

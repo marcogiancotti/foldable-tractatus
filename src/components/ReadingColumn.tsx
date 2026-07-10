@@ -22,6 +22,7 @@ interface Props {
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
   onStopEditNote: () => void;
+  onDeleteNote: (n: string) => void;
   /** empty marker before the first row — the control panel aligns its top to it */
   firstRowRef?: Ref<HTMLDivElement>;
 }
@@ -43,6 +44,7 @@ export default function ReadingColumn({
   onStartEditNote,
   onCommitNote,
   onStopEditNote,
+  onDeleteNote,
   firstRowRef,
 }: Props) {
   const annotationCount = Object.keys(notes).length;
@@ -166,6 +168,7 @@ export default function ReadingColumn({
               onStartEditNote={onStartEditNote}
               onCommitNote={onCommitNote}
               onStopEditNote={onStopEditNote}
+              onDeleteNote={onDeleteNote}
             />
           ) : (
             <PeekRange

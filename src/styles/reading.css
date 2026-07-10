@@ -197,6 +197,12 @@
   font-variation-settings: 'FILL' 1;
 }
 
+/* ---- inline math (KaTeX inherits color, so themes just work) ---- */
+
+.math .katex {
+  font-size: 1.06em; /* sits well in the 17px/300 body text */
+}
+
 /* ---- inline term marks & active-term highlight ---- */
 
 .idx-term {
@@ -408,11 +414,34 @@
   caret-color: var(--accent);
 }
 
+.note-edit-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
 .note-meta {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink40);
-  margin-top: 4px;
+}
+
+.note-trash {
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink40);
+  cursor: pointer;
+  user-select: none;
+  transition: color 120ms ease;
+}
+
+.note-trash:hover {
+  color: var(--ink100);
 }
 
 .row-note-btn {
