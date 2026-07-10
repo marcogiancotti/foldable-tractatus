@@ -5,9 +5,12 @@
 }
 
 @media print {
+  /* .print-view lives OUTSIDE .app-root — display:none on an ancestor cannot
+     be undone from a descendant, so hiding the shell must not hide it. */
   .app-root,
   .toast-wrap,
-  .modal-scrim {
+  .modal-scrim,
+  .guide-scrim {
     display: none !important;
   }
 

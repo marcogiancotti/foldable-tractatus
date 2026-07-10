@@ -271,6 +271,11 @@ export default function ThreadsMenu({
               <span className="cp-slots">{slotsLeft} left</span>
             </div>
           )}
+
+          <div className="cp-menu-hint">
+            Threads stay in this browser. To send the current view to someone, use Share under
+            More.
+          </div>
         </div>
       )}
     </div>

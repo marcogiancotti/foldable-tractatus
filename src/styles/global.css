@@ -62,12 +62,18 @@ body {
 }
 
 .panel-col {
-  flex: 0 0 auto;
+  /* Constant track = open-panel width, so collapsing the panel (108↔176px,
+     panel.css) moves only its own left edge and never re-centers the row —
+     the reading column stays put. */
+  flex: 0 0 176px;
 }
 
 .panel-sticky {
   position: sticky;
   top: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* panel + term card stay flush against the reading column */
 }
 
 @media (max-width: 1179px) {

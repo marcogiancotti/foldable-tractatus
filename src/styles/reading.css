@@ -281,9 +281,10 @@
 
 .note-wrap.is-margin {
   position: absolute;
-  top: 5px;
+  top: 5px; /* resting offset; the layout pass overrides it inline (§6) */
   left: calc(100% + 44px);
   width: 236px;
+  transition: top 200ms ease;
 }
 
 .note-wrap.is-inline {
@@ -305,14 +306,66 @@
   border-left-color: var(--accent);
 }
 
-.note-text {
+.note-main {
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+.note-text {
+  display: block;
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink60);
   white-space: pre-wrap;
   text-wrap: pretty;
   transition: color 120ms ease;
+}
+
+/* margin notes rest clamped; editing shows the full text (§6) */
+.note-text.note-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* statement number, shown only while the note sits away from its row */
+.note-num {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1;
+  color: var(--ink40);
+  margin-bottom: 3px;
+  user-select: none;
+}
+
+.note-wrap.is-displaced .note-num {
+  display: block;
+}
+
+/* quiet hint, shown only when the clamp actually cuts text */
+.note-more {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  margin-top: 2px;
+  user-select: none;
+}
+
+.note-wrap.is-overflowing .note-more {
+  display: block;
+}
+
+/* hover pairing: row ↔ its margin note (the note lives inside the row-group) */
+.row-group:hover .note-box {
+  border-left-color: var(--accent);
+}
+
+.row-group:has(.note-wrap.is-margin:hover) > .row {
+  background: var(--hover-surface);
 }
 
 .note-box:hover .note-text,

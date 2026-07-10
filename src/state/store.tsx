@@ -20,6 +20,7 @@ import { decodeViewState, statementParam } from '../model/urlState';
 import { loadNotes, saveNotes } from './persistence';
 import {
   foldAllOverrides,
+  normalizeOverrides,
   promotePeeks,
   revealStatement,
   setRowExpansion,
@@ -29,7 +30,7 @@ import {
   type Pins,
 } from '../model/focusedView';
 
-export const NOTE_LIMIT = 2000;
+export const NOTE_LIMIT = 1000;
 const HISTORY_LIMIT = 100;
 
 export interface ToastState {
@@ -62,6 +63,7 @@ export type AppAction =
   | { type: 'foldAll' }
   | { type: 'unfoldAll' }
   | { type: 'togglePin'; n: string }
+  | { type: 'clearPins' }
   | { type: 'isolate'; n: string; message?: string }
   | {
       type: 'applyPins';
@@ -142,6 +144,18 @@ export function reducer(s: AppState, a: AppAction): AppState {
       if (pins.has(a.n)) pins.delete(a.n);
       else pins.add(a.n);
       return withHistory(s, { pins, activePath: null });
+    }
+
+    case 'clearPins': {
+      // Unlike applyPins:replace, manual expansion survives — only pins go.
+      // Re-normalize so overrides that only mattered under the old pins drop.
+      const none: Pins = new Set();
+      return withHistory(s, {
+        pins: none,
+        overrides: normalizeOverrides(none, s.overrides),
+        activePath: null,
+        toast: makeToast('All pins removed', true),
+      });
     }
 
     case 'isolate':

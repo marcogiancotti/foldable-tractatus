@@ -5,7 +5,7 @@
   statement otherwise.
 */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { NOTE_LIMIT } from '../state/store';
 
 interface Props {
@@ -67,6 +67,14 @@ export default function AnnotationNote({
     onStopEdit();
   };
 
+  // Enter confirms and closes the editor; Shift+Enter inserts a newline (§6).
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleBlur();
+    }
+  };
+
   const wrapStyle = marginMode
     ? undefined
     : { marginLeft: indent + 92, marginTop: -1, marginBottom: 8 };
@@ -85,6 +93,7 @@ export default function AnnotationNote({
               handleChange(e.target.value);
             }}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
           />
           <div className="note-meta">
             autosaved · {(NOTE_LIMIT - draft.length).toLocaleString()} left
@@ -104,7 +113,24 @@ export default function AnnotationNote({
             }
           }}
         >
-          <span className="note-text">{text}</span>
+          {/* Margin notes rest clamped to a few lines and never overlap (§6);
+              the number label shows only while the note sits away from its
+              statement (.is-displaced), the "more" hint only when the clamp
+              actually cuts text (.is-overflowing) — both set by the layout
+              pass in ReadingColumn. */}
+          <span className="note-main">
+            {marginMode && (
+              <span className="note-num" aria-hidden="true">
+                {n}
+              </span>
+            )}
+            <span className={`note-text${marginMode ? ' note-clamp' : ''}`}>{text}</span>
+            {marginMode && (
+              <span className="note-more" aria-hidden="true">
+                ⌄ more
+              </span>
+            )}
+          </span>
           <span className="note-pencil msym" aria-hidden="true">
             edit
           </span>

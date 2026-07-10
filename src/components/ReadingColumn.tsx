@@ -1,5 +1,6 @@
-import type { Ref } from 'react';
+import { useLayoutEffect, useRef, type Ref } from 'react';
 import type { DisplayItem } from '../model/focusedView';
+import { computeNoteTops } from '../lib/noteLayout';
 import { ROOT_IDS, STATEMENTS } from '../model/tree';
 import PeekRange from './PeekRange';
 import StatementRow from './StatementRow';
@@ -45,8 +46,64 @@ export default function ReadingColumn({
   firstRowRef,
 }: Props) {
   const annotationCount = Object.keys(notes).length;
+
+  /*
+    Margin-note layout (spec §6): notes are absolutely positioned inside their
+    own .row-group, so left alone they collide when annotated rows sit close.
+    This pass measures every margin note, computes non-overlapping offsets
+    (computeNoteTops — the note being edited is the "active" one, pinned to
+    its anchor), and writes them back as inline `top`s. Direct DOM writes on
+    purpose: measuring and positioning in one place, no re-render loop.
+  */
+  const colRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const col = colRef.current;
+    if (!col) return;
+    const wraps = () => [...col.querySelectorAll<HTMLElement>('.note-wrap.is-margin')];
+    if (!marginMode) {
+      for (const w of wraps()) {
+        w.style.top = '';
+        w.classList.remove('is-displaced', 'is-overflowing');
+      }
+      return;
+    }
+    const NOTE_TOP = 5; // .note-wrap.is-margin's resting offset within its row
+    const GAP = 12;
+    const apply = () => {
+      const ws = wraps();
+      if (ws.length === 0) return;
+      const groups = ws.map((w) => w.closest<HTMLElement>('.row-group')!);
+      const anchors = groups.map((g) => g.offsetTop + NOTE_TOP);
+      const heights = ws.map((w) => w.offsetHeight);
+      const activeIdx = editingNote
+        ? groups.findIndex(
+            (g) => g.querySelector<HTMLElement>('.row')?.dataset.n === editingNote,
+          )
+        : -1;
+      const tops = computeNoteTops(anchors, heights, GAP, activeIdx >= 0 ? activeIdx : null);
+      ws.forEach((w, i) => {
+        w.style.top = `${tops[i] - groups[i].offsetTop}px`;
+        w.classList.toggle('is-displaced', Math.abs(tops[i] - anchors[i]) > 1);
+        const clamped = w.querySelector<HTMLElement>('.note-clamp');
+        w.classList.toggle(
+          'is-overflowing',
+          clamped !== null && clamped.scrollHeight > clamped.clientHeight + 1,
+        );
+      });
+    };
+    apply();
+    if (typeof ResizeObserver === 'undefined') return;
+    // Re-run on any size change: fonts settling, the editing textarea growing,
+    // the column reflowing. Toggling is-overflowing resizes a note once more;
+    // the follow-up pass reaches a fixed point and the observer goes quiet.
+    const ro = new ResizeObserver(apply);
+    ro.observe(col);
+    for (const w of wraps()) ro.observe(w);
+    return () => ro.disconnect();
+  }, [display, notes, editingNote, marginMode]);
+
   return (
-    <main className="reading-col">
+    <main className="reading-col" ref={colRef}>
       <header>
         <div style={{ maxWidth: 640 }}>
           <h1 className="rc-h1">
@@ -66,6 +123,12 @@ export default function ReadingColumn({
           <span>{STATEMENTS.length} statements</span>
           <span className="rc-meta-sep">/</span>
           <span>{ROOT_IDS.length} branches</span>
+          {pins.size > 1 && (
+            <>
+              <span className="rc-meta-sep">/</span>
+              <span>{pins.size} pins</span>
+            </>
+          )}
           {annotationCount > 0 && (
             <>
               <span className="rc-meta-sep">/</span>

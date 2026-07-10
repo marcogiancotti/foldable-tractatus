@@ -15,6 +15,7 @@ interface ControlPanelProps {
   onUnfoldAll: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  onUnpinAll: () => void;
   onHelp: () => void;
   onShare: () => void;
   onExportMarkdown: () => void;
@@ -59,6 +60,7 @@ export default function ControlPanel({
   onUnfoldAll,
   onUndo,
   onRedo,
+  onUnpinAll,
   onHelp,
   onShare,
   onExportMarkdown,
@@ -114,12 +116,20 @@ export default function ControlPanel({
     };
   }, [exportOpen]);
 
+  // two rows of three (.cp-toolbar grid): help·fold·unfold / undo·redo·unpin
   const tools: ToolSpec[] = [
     { id: 'help', icon: 'help', label: 'shortcuts', onClick: onHelp },
     { id: 'foldall', icon: 'unfold_less', label: 'fold all', onClick: onFoldAll },
     { id: 'unfoldall', icon: 'unfold_more', label: 'unfold all', onClick: onUnfoldAll },
     { id: 'undo', icon: 'undo', label: 'undo', onClick: onUndo, disabled: !canUndo },
     { id: 'redo', icon: 'redo', label: 'redo', onClick: onRedo, disabled: !canRedo },
+    {
+      id: 'unpinall',
+      icon: 'clear_all',
+      label: 'unpin all',
+      onClick: onUnpinAll,
+      disabled: pinCount === 0,
+    },
   ];
 
   const searchActive = searchFocused || termActive;

@@ -34,6 +34,8 @@ The reading experience is one of **controlled disclosure**: the reader opens onl
 - Each statement has a **pin** control. Pinning marks a statement as personally significant.
 - Each statement also has an **isolate** ("focus on this only") control: it makes that statement the sole pinned statement, replacing any existing pins. This is the same mechanism used for deep-linking (Section 12). Because it is a pin-replacing action, it is a single, clearly-undoable step (Section 12).
 - Pins are the backbone of focused reading, sharing, export, and reading paths.
+- The reading column's information line reports the **number of pinned statements** (alongside the statement and branch counts) whenever more than one statement is pinned.
+- A prominent **"unpin all"** action clears the entire pin set. Because it destroys a possibly carefully-built pin set, it asks for confirmation first, with the same brief warning-and-confirm treatment as the other pin-replacing actions — and, like them, it is a single, clearly-undoable step (Section 12). Manual expansion survives it; only the pins go.
 
 ## 5. Focused reading (the folded-with-pins view)
 
@@ -61,8 +63,9 @@ Crucially, peeks are **computed, not managed** — the reader never sets them. T
 
 - The reader can attach a personal **annotation** to any statement, and edit or delete it.
 - **Plain text only.** Annotations are never parsed, interpreted, or rendered as markup (no Markdown, no HTML, no rich text). They are stored as text and displayed as text — inserted as text content, never as markup — so there is **no rendering step and no injection surface**, even for annotations that arrive in an imported or synced bundle. Line breaks are preserved, so multi-paragraph notes still read cleanly.
-- **No edit/save flow.** There is a single text field; changes **autosave automatically after a short debounce** as the reader types. There is no separate display mode and no explicit Save action.
-- **Length cap:** annotations are bounded, not unbounded. Working cap: roughly **2,000 characters** per annotation (about 300–350 words); tunable. Remaining budget is shown as the reader approaches it.
+- **No edit/save flow.** There is a single text field; changes **autosave automatically after a short debounce** as the reader types. There is no separate display mode and no explicit Save action. **Enter closes the editor** (the note is already saved); **Shift+Enter inserts a line break**.
+- **Length cap:** annotations are bounded, not unbounded. Cap: **1,000 characters** per annotation (about 150–175 words). Remaining budget is shown as the reader approaches it.
+- **Margin notes never overlap.** When notes crowd each other (folding often brings annotated statements close together), a long note rests folded to its first few lines, and notes slide down just enough that none covers another. Opening a note (click, or editing it) expands it in place while its neighbours make room — nothing is ever occluded. A note resting away from its statement is labelled with the statement's number so the pairing stays legible.
 - Annotations are private study notes. They persist locally between sessions automatically, and are **never** carried in the shareable link (Section 7).
 
 ## 7. Sharing and persistence
@@ -114,13 +117,15 @@ _(Removed: styled-HTML export — PDF covers the print/read-outside case more co
 
 - The app ships a small set of **curated reading paths** — named, pre-built pin-sets that trace a theme through the book (for example, the picture theory, the saying/showing distinction, or the closing ladder).
 - Selecting a reading path establishes its pins and drops the reader into the focused view for that thread.
+- Applying a reading path — or one of the reader's saved personal threads — **replaces the current pin set**. When pins already exist, the app therefore asks for confirmation first, with the same brief warning-and-confirm treatment as "Pin only these" (Section 9); when no pins are set it applies immediately. Like every pin-replacing action, it remains a single, clearly-undoable step (Section 12).
 - A reading path is just a pin-set, and pin-sets are part of view state, so a reader can also **share their own arrangement as a link** — curated paths and personal sharing use the same mechanism.
+- The reader's saved personal threads live outside the in-app history, so **deleting a thread is not undoable** — deletion therefore asks for confirmation first.
 
 ## 12. Navigation and history
 
 - **Deep-linkable statements:** every statement is individually addressable by a link that isolates it (Section 4) and scrolls it into view.
 - **Keyboard navigation:** move between statements with the arrow keys (and also j/k for readers who prefer them), with keys for expand/fold and pin.
-- **Undo / redo:** the app keeps its own in-app history of actions (fold, pin, isolate, "Pin only these", annotate, apply reading path), traversable with undo/redo. It is **not** wired to the browser Back button, so navigation is never hijacked and history is never flooded. Native text-editing undo inside an annotation field works as usual. **Pin-replacing actions (isolate, "Pin only these") are single undoable steps** and surface an immediate undo affordance so an accidental replacement is trivially reversible. At minimum, the reader can always recover prior states within a session.
+- **Undo / redo:** the app keeps its own in-app history of actions (fold, pin, isolate, "Pin only these", annotate, apply reading path), traversable with undo/redo. It is **not** wired to the browser Back button, so navigation is never hijacked and history is never flooded. Native text-editing undo inside an annotation field works as usual. **Pin-replacing actions (isolate, "Pin only these", applying a reading path or saved thread, unpin all) are single undoable steps** and surface an immediate undo affordance so an accidental replacement is trivially reversible. At minimum, the reader can always recover prior states within a session.
 
 ## 13. State summary
 
@@ -131,7 +136,7 @@ _(Removed: styled-HTML export — PDF covers the print/read-outside case more co
 ## 14. Open questions to resolve
 
 1. **Peek treatment** — four-state model tentatively approved; settle exactly how quiet a peek is (full sibling row vs. a compact "N more" indicator) during design.
-2. **Annotation length cap** — confirm the exact figure (~2,000 characters is the working value).
+2. ~~**Annotation length cap**~~ — resolved 2026-07-10: confirmed at **1,000 characters** (Section 6).
 3. **Glossary/term construction** — method and scope of the build-time term analysis; deferred.
 4. **Cloud sync** — abuse posture defined; remaining work is to confirm concrete caps/TTL and monitor for abuse, escalating to a write barrier only if needed.
 

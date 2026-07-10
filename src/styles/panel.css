@@ -18,6 +18,14 @@
   z-index: 40;
 }
 
+/* .panel-sticky (global.css) is position:sticky and therefore its own
+   stacking context; without lifting the wrapper itself, is-elevated stays
+   trapped beneath later-DOM content such as .xref-pop (z-index 30).
+   Ladder: toast 60 / guide 55 / modal 50 / this 40 / xref-pop 30. */
+.panel-sticky:has(.cp-panel.is-elevated) {
+  z-index: 40;
+}
+
 .cp-head {
   display: flex;
   align-items: center;
@@ -155,8 +163,11 @@
 /* ---- toolbar ---- */
 
 .cp-toolbar {
-  display: flex;
-  justify-content: space-between;
+  /* six tools read as two rows of three, not one crowded line */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  row-gap: 2px;
   margin: 10px 0 0;
   overflow: visible;
 }
@@ -322,6 +333,15 @@
 .cp-menu-sec-dim {
   color: var(--ink24);
   letter-spacing: 0.5px;
+}
+
+.cp-menu-hint {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink40);
+  padding: 6px 8px 3px;
+  user-select: none;
 }
 
 .cp-menu-row {

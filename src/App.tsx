@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import ConfirmModal from './components/ConfirmModal';
+import ConfirmModal, { type ConfirmRequest } from './components/ConfirmModal';
 import ControlPanel from './components/ControlPanel';
 import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
@@ -28,16 +28,29 @@ import { StoreProvider, useStore } from './state/store';
 import { MAX_THREADS, useThreads } from './state/threads';
 import { useTheme } from './theme';
 
+/*
+  One pending action awaiting the reader's confirmation (spec §4/§9/§11):
+  loading a notes bundle, "Pin only these", applying a reading path / saved
+  thread over existing pins, unpinning everything, or deleting a saved thread
+  (the only one that is NOT undoable — threads live outside history). All of
+  them destroy state, so all go through the same ConfirmModal.
+*/
+type PendingConfirm =
+  | { kind: 'import'; payload: BundlePayload }
+  | { kind: 'pinOnly' }
+  | { kind: 'applySet'; source: 'path' | 'thread'; pins: string[]; name: string; pathId?: string }
+  | { kind: 'unpinAll' }
+  | { kind: 'deleteThread'; id: string; name: string; pins: number };
+
 function AppInner() {
   const { state, dispatch } = useStore();
   const threadsApi = useThreads();
   const [theme, toggleTheme] = useTheme();
   const searchRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(true);
-  const [confirmPinOnly, setConfirmPinOnly] = useState(false);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [importPending, setImportPending] = useState<BundlePayload | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const marginMode = useMediaQuery('(min-width: 1180px)');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
@@ -90,7 +103,7 @@ function AppInner() {
           await decryptBundle(bundle, inboundBundle.key),
         );
         if (cancelled) return;
-        if (payload) setImportPending(payload);
+        if (payload) setPendingConfirm({ kind: 'import', payload });
         else dispatch({ type: 'toast', message: 'This link holds no readable notes' });
       } catch {
         if (!cancelled) {
@@ -236,12 +249,118 @@ function AppInner() {
       message: `Pins replaced — "${name}" (${pins.length} pin${pins.length === 1 ? '' : 's'})`,
     });
 
+  // Applying a path/thread replaces the pins, so existing pins get a confirm
+  // first (spec §11); with nothing to overwrite it applies immediately.
+  const requestApplyPinSet = (
+    source: 'path' | 'thread',
+    pins: string[],
+    name: string,
+    pathId?: string,
+  ) => {
+    if (state.pins.size === 0) applyPinSet(pins, name, pathId);
+    else setPendingConfirm({ kind: 'applySet', source, pins, name, pathId });
+  };
+
   const setTerm = (value: string) =>
     dispatch({ type: 'setTerm', term: value.trim() ? value : null });
 
   const matchCount = termStats?.matches.length ?? 0;
 
+  const confirmRequest = ((): ConfirmRequest | null => {
+    if (!pendingConfirm) return null;
+    switch (pendingConfirm.kind) {
+      case 'import': {
+        const notes = Object.keys(pendingConfirm.payload.notes).length;
+        const pins = pendingConfirm.payload.pins.length;
+        return {
+          title: 'Load notes from this link?',
+          body:
+            `This link holds ${notes} annotation${notes === 1 ? '' : 's'} and ` +
+            `${pins} pin${pins === 1 ? '' : 's'}. ` +
+            'Loading them replaces your current annotations and pins. This is undoable.',
+          confirmLabel: 'Load notes',
+        };
+      }
+      case 'pinOnly':
+        if (!term || !termStats) return null;
+        return {
+          title: 'Replace your current pins?',
+          body:
+            `This pins only the ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
+            `containing "${term}" and clears your current pins. This is undoable.`,
+          confirmLabel: 'Yes',
+        };
+      case 'applySet': {
+        const { pins, name } = pendingConfirm;
+        return {
+          title: 'Replace your current pins?',
+          body:
+            `"${name}" pins ${pins.length} statement${pins.length === 1 ? '' : 's'} and clears ` +
+            `your current ${state.pins.size} pin${state.pins.size === 1 ? '' : 's'}. ` +
+            'This is undoable.',
+          confirmLabel: 'Yes',
+        };
+      }
+      case 'unpinAll': {
+        const n = state.pins.size;
+        return {
+          title: 'Remove all pins?',
+          body:
+            `This unpins all ${n} statement${n === 1 ? '' : 's'}. ` +
+            'Open branches and your notes stay. This is undoable.',
+          confirmLabel: 'Yes',
+        };
+      }
+      case 'deleteThread': {
+        const { name, pins } = pendingConfirm;
+        return {
+          title: 'Delete this thread?',
+          body:
+            `"${name}" (${pins} pin${pins === 1 ? '' : 's'}) will be deleted from this ` +
+            'browser. Threads are outside undo history — this cannot be undone.',
+          confirmLabel: 'Yes',
+        };
+      }
+    }
+  })();
+
+  const confirmPending = () => {
+    if (!pendingConfirm) return;
+    switch (pendingConfirm.kind) {
+      case 'import':
+        dispatch({ type: 'importBundle', ...pendingConfirm.payload });
+        break;
+      case 'pinOnly':
+        if (term && termStats) {
+          dispatch({
+            type: 'applyPins',
+            pins: termStats.matches,
+            mode: 'replace',
+            message:
+              `Pins replaced — ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
+              `with "${term}"`,
+          });
+        }
+        break;
+      case 'applySet':
+        applyPinSet(pendingConfirm.pins, pendingConfirm.name, pendingConfirm.pathId);
+        break;
+      case 'unpinAll':
+        dispatch({ type: 'clearPins' });
+        break;
+      case 'deleteThread':
+        threadsApi.remove(pendingConfirm.id);
+        dispatch({ type: 'toast', message: `Thread "${pendingConfirm.name}" deleted` });
+        break;
+    }
+    setPendingConfirm(null);
+  };
+
   return (
+    // Overlays and the print view sit OUTSIDE .app-root: print.css blanks
+    // .app-root wholesale, and display:none on an ancestor is not undoable
+    // from a descendant, so .print-view must be a sibling to print at all.
+    <>
     <div className="app-root" ref={rootRef}>
       <div className="panel-col">
         <div className="panel-sticky" style={{ marginTop: panelTop }}>
@@ -252,6 +371,7 @@ function AppInner() {
             onUnfoldAll={() => dispatch({ type: 'unfoldAll' })}
             onUndo={() => dispatch({ type: 'undo' })}
             onRedo={() => dispatch({ type: 'redo' })}
+            onUnpinAll={() => setPendingConfirm({ kind: 'unpinAll' })}
             onHelp={() => setHelpOpen(true)}
             onShare={shareView}
             onExportMarkdown={exportMarkdown}
@@ -261,16 +381,46 @@ function AppInner() {
             maxThreads={MAX_THREADS}
             onApplyPreset={(id) => {
               const p = pathById.get(id);
-              if (p) applyPinSet(p.pins, p.name, p.id);
+              if (p) requestApplyPinSet('path', p.pins, p.name, p.id);
             }}
             onApplyThread={(id) => {
               const t = threadsApi.threads.find((t) => t.id === id);
-              if (t) applyPinSet(t.pins, t.name);
+              if (t) requestApplyPinSet('thread', t.pins, t.name);
             }}
-            onSaveThread={(name) => threadsApi.save(name, [...state.pins])}
-            onRenameThread={threadsApi.rename}
-            onOverwriteThread={(id) => threadsApi.overwrite(id, [...state.pins])}
-            onDeleteThread={threadsApi.remove}
+            onSaveThread={(name) => {
+              threadsApi.save(name, [...state.pins]);
+              dispatch({
+                type: 'toast',
+                message: `Thread "${name}" saved — Share (under More) copies a link to this view`,
+              });
+            }}
+            onRenameThread={(id, name) => {
+              threadsApi.rename(id, name);
+              dispatch({ type: 'toast', message: `Thread renamed to "${name}"` });
+            }}
+            onOverwriteThread={(id) => {
+              const t = threadsApi.threads.find((t) => t.id === id);
+              threadsApi.overwrite(id, [...state.pins]);
+              if (t) {
+                dispatch({
+                  type: 'toast',
+                  message:
+                    `Thread "${t.name}" updated — now ` +
+                    `${state.pins.size} pin${state.pins.size === 1 ? '' : 's'}`,
+                });
+              }
+            }}
+            onDeleteThread={(id) => {
+              const t = threadsApi.threads.find((t) => t.id === id);
+              if (t) {
+                setPendingConfirm({
+                  kind: 'deleteThread',
+                  id: t.id,
+                  name: t.name,
+                  pins: t.pins.length,
+                });
+              }
+            }}
             pinCount={state.pins.size}
             searchValue={term ?? ''}
             onSearchChange={setTerm}
@@ -290,7 +440,7 @@ function AppInner() {
               statementCount={matchCount}
               narrow={!panelOpen}
               onClear={() => setTerm('')}
-              onPinOnly={() => setConfirmPinOnly(true)}
+              onPinOnly={() => setPendingConfirm({ kind: 'pinOnly' })}
               onAddPins={() => dispatch({ type: 'applyPins', pins: termStats.matches, mode: 'add' })}
             />
           )}
@@ -319,59 +469,20 @@ function AppInner() {
         firstRowRef={firstRowRef}
       />
       <div className="note-rail" aria-hidden="true" />
-      <UndoToast
-        toast={state.toast}
-        onUndo={() => dispatch({ type: 'undo' })}
-        onDismiss={() => dispatch({ type: 'dismissToast' })}
-      />
-      <ReaderGuide open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />
-      <ConfirmModal
-        request={
-          importPending
-            ? {
-                title: 'Load notes from this link?',
-                body:
-                  `This link holds ${Object.keys(importPending.notes).length} annotation` +
-                  `${Object.keys(importPending.notes).length === 1 ? '' : 's'} and ` +
-                  `${importPending.pins.length} pin${importPending.pins.length === 1 ? '' : 's'}. ` +
-                  'Loading them replaces your current annotations and pins. This is undoable.',
-                confirmLabel: 'Load notes',
-              }
-            : confirmPinOnly && term && termStats
-              ? {
-                  title: 'Replace your current pins?',
-                  body:
-                    `This pins only the ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
-                    `containing "${term}" and clears your current pins. This is undoable.`,
-                  confirmLabel: 'Replace pins',
-                }
-              : null
-        }
-        onConfirm={() => {
-          if (importPending) {
-            dispatch({ type: 'importBundle', ...importPending });
-            setImportPending(null);
-            return;
-          }
-          if (term && termStats) {
-            dispatch({
-              type: 'applyPins',
-              pins: termStats.matches,
-              mode: 'replace',
-              message:
-                `Pins replaced — ${matchCount} statement${matchCount === 1 ? '' : 's'} ` +
-                `with "${term}"`,
-            });
-          }
-          setConfirmPinOnly(false);
-        }}
-        onCancel={() => {
-          setImportPending(null);
-          setConfirmPinOnly(false);
-        }}
-      />
     </div>
+    <UndoToast
+      toast={state.toast}
+      onUndo={() => dispatch({ type: 'undo' })}
+      onDismiss={() => dispatch({ type: 'dismissToast' })}
+    />
+    <ReaderGuide open={helpOpen} onClose={() => setHelpOpen(false)} />
+    <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />
+    <ConfirmModal
+      request={confirmRequest}
+      onConfirm={confirmPending}
+      onCancel={() => setPendingConfirm(null)}
+    />
+    </>
   );
 }
 
