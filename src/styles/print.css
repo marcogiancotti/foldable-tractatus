@@ -10,7 +10,11 @@
   .app-root,
   .toast-wrap,
   .modal-scrim,
-  .guide-scrim {
+  .guide-scrim,
+  .mobile-bar,
+  .mobile-scrim,
+  .mobile-sheet,
+  .mobile-term-dock {
     display: none !important;
   }
 

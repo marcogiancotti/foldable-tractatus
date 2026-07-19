@@ -1,0 +1,191 @@
+/*
+  Mobile layout (≤719px): single reading column; the panel column is not
+  rendered (App.tsx) — its contents live in a bottom sheet opened from a fixed
+  bottom bar. Indentation collapses to depth rails (reading.css defines them).
+  Interaction changes for touch live under @media (hover: none) instead —
+  capability, not width.
+*/
+
+@media (max-width: 719px) {
+  :root {
+    --indent-step: 0px; /* rails carry depth; padding indent switches off */
+  }
+
+  .app-root {
+    padding: 0 10px;
+    gap: 0;
+  }
+
+  .reading-col {
+    /* bottom padding keeps the last rows clear of the bar + term card dock */
+    padding: 40px 0 140px;
+  }
+
+  .rc-h1 {
+    font-size: 34px;
+  }
+
+  .rc-intro {
+    font-size: 16px;
+  }
+
+  .row,
+  .peek-row {
+    gap: 8px;
+    padding-right: 4px;
+  }
+
+  .row-num {
+    min-width: 0;
+  }
+
+  /* actions float in the row's top-right corner; only the first text line
+     yields to them (the floated spacer), the rest wrap full-width */
+  .row {
+    position: relative;
+  }
+
+  .row-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: absolute;
+    top: 8px;
+    right: 6px;
+  }
+
+  .row-actions .row-note-btn,
+  .row-actions .row-share-btn,
+  .row-actions .row-pin {
+    margin-left: 0;
+    transform: none;
+  }
+
+  .row-actions-spacer {
+    display: block;
+    float: right;
+    width: 104px;
+    height: 24px;
+  }
+
+  .depth-rails {
+    display: flex;
+  }
+
+  .note-wrap.is-inline {
+    margin-left: 39px; /* toggle column + gap — notes align with the number */
+  }
+
+  /* anchored popover would overflow the narrow column; span the row instead */
+  .xref-wrap {
+    position: static;
+  }
+
+  .xref-pop {
+    left: 4px;
+    right: 4px;
+    width: auto;
+  }
+
+  /* ---- bottom bar ---- */
+
+  .mobile-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 45; /* below modal 50 / guide 55 / toast 60 */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 4px 8px calc(4px + env(safe-area-inset-bottom));
+    background: var(--paper);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .mobile-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 44px;
+    border: none;
+    background: none;
+    padding: 0;
+    border-radius: var(--radius);
+    color: var(--ink60);
+    cursor: pointer;
+  }
+
+  .mobile-bar-btn:active {
+    background: var(--tap-surface);
+  }
+
+  .mobile-bar-btn.is-disabled {
+    color: var(--ink24);
+  }
+
+  .mobile-bar-btn .msym {
+    font-size: 22px;
+  }
+
+  /* ---- bottom sheet (the control panel's mobile home) ---- */
+
+  .mobile-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 46;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 47;
+    max-height: 82dvh;
+    overflow-y: auto;
+    background: var(--paper);
+    border-top: 1px solid var(--hairline);
+    border-radius: 12px 12px 0 0;
+    box-shadow: var(--shadow-overlay);
+    padding: 6px 18px calc(18px + env(safe-area-inset-bottom));
+    animation: sheet-in 180ms ease;
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0.6;
+    }
+  }
+
+  .mobile-sheet-grip {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--ink24);
+    margin: 4px auto 12px;
+  }
+
+  .mobile-sheet .cp-panel,
+  .mobile-sheet .cp-panel.is-open {
+    width: 100%;
+  }
+
+  /* ---- selected-term card, docked above the bar ---- */
+
+  .mobile-term-dock {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(58px + env(safe-area-inset-bottom));
+    z-index: 44;
+  }
+
+  .mobile-term-dock .term-card {
+    width: 100%;
+    margin-top: 0;
+  }
+}

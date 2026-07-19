@@ -36,6 +36,10 @@
   /* surfaces */
   --radius: 4px;
   --radius-sm: 3px;
+
+  /* statement indentation (mobile collapses the step and shows depth rails) */
+  --indent-base: 4px;
+  --indent-step: 30px;
 }
 
 :root[data-theme='dark'] {

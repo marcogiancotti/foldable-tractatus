@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ConfirmModal, { type ConfirmRequest } from './components/ConfirmModal';
 import ControlPanel from './components/ControlPanel';
+import { MobileBar, MobileSheet } from './components/MobileControls';
 import ReadingColumn from './components/ReadingColumn';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
@@ -61,6 +62,9 @@ function AppInner() {
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const marginMode = useMediaQuery('(min-width: 1180px)');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  // ≤719px: no panel column — the control panel lives in a bottom sheet
+  const mobile = useMediaQuery('(max-width: 719px)');
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   // Cross-ref / deep-link navigation: reveal → scroll to ~30% viewport → flash.
   const [flashN, setFlashN] = useState<string | null>(null);
@@ -205,11 +209,13 @@ function AppInner() {
     editNote: (n) => setEditingNote(n),
     focusSearch: () => {
       setPanelOpen(true);
+      if (mobile) setSheetOpen(true); // the panel only renders inside the sheet
       setSearchFocusPending(true);
     },
     openHelp: () => setHelpOpen(true),
     escape: () => {
       if (helpOpen) setHelpOpen(false);
+      else if (sheetOpen) setSheetOpen(false);
       else if (state.activeTerm) dispatch({ type: 'setTerm', term: null });
       else (document.activeElement as HTMLElement | null)?.blur?.();
     },
@@ -377,99 +383,110 @@ function AppInner() {
     setPendingConfirm(null);
   };
 
+  // One panel instance, homed per breakpoint: the sticky side column on
+  // desktop, the bottom sheet on mobile (where it renders forced-open and
+  // collapsing its head closes the sheet instead).
+  const panel = (
+    <ControlPanel
+      canUndo={state.past.length > 0}
+      canRedo={state.future.length > 0}
+      onFoldAll={() => dispatch({ type: 'foldAll' })}
+      onUnfoldAll={() => dispatch({ type: 'unfoldAll' })}
+      onUndo={() => dispatch({ type: 'undo' })}
+      onRedo={() => dispatch({ type: 'redo' })}
+      onUnpinAll={() => setPendingConfirm({ kind: 'unpinAll' })}
+      onHelp={() => setHelpOpen(true)}
+      onShare={shareView}
+      onExportMarkdown={exportMarkdown}
+      onExportPdf={exportPdf}
+      presets={READING_PATHS}
+      threads={threadsApi.threads}
+      maxThreads={MAX_THREADS}
+      onApplyPreset={(id) => {
+        const p = pathById.get(id);
+        if (p) requestApplyPinSet('path', p.pins, p.name, p.id);
+      }}
+      onApplyThread={(id) => {
+        const t = threadsApi.threads.find((t) => t.id === id);
+        if (t) requestApplyPinSet('thread', t.pins, t.name);
+      }}
+      onSaveThread={(name) => {
+        threadsApi.save(name, [...state.pins]);
+        dispatch({
+          type: 'toast',
+          message: `Thread "${name}" saved — Share (under More) copies a link to this view`,
+        });
+      }}
+      onRenameThread={(id, name) => {
+        threadsApi.rename(id, name);
+        dispatch({ type: 'toast', message: `Thread renamed to "${name}"` });
+      }}
+      onOverwriteThread={(id) => {
+        const t = threadsApi.threads.find((t) => t.id === id);
+        threadsApi.overwrite(id, [...state.pins]);
+        if (t) {
+          dispatch({
+            type: 'toast',
+            message:
+              `Thread "${t.name}" updated — now ` +
+              `${state.pins.size} pin${state.pins.size === 1 ? '' : 's'}`,
+          });
+        }
+      }}
+      onDeleteThread={(id) => {
+        const t = threadsApi.threads.find((t) => t.id === id);
+        if (t) {
+          setPendingConfirm({
+            kind: 'deleteThread',
+            id: t.id,
+            name: t.name,
+            pins: t.pins.length,
+          });
+        }
+      }}
+      pinCount={state.pins.size}
+      searchValue={term ?? ''}
+      onSearchChange={setTerm}
+      onClearTerm={() => setTerm('')}
+      termActive={term !== null}
+      termCount={termStats?.occurrences ?? 0}
+      searchRef={searchRef}
+      onSearchLeave={() =>
+        document.querySelector<HTMLElement>('[data-nav]')?.focus()
+      }
+      open={mobile ? true : panelOpen}
+      onOpenChange={mobile ? (v) => !v && setSheetOpen(false) : setPanelOpen}
+      theme={theme}
+      onToggleTheme={toggleTheme}
+      onSaveToLink={syncAvailable() ? saveToLink : undefined}
+    />
+  );
+
+  const termCard = term && termStats && (
+    <TermCard
+      term={term}
+      occurrences={termStats.occurrences}
+      statementCount={matchCount}
+      onClear={() => setTerm('')}
+      onPinOnly={() => setPendingConfirm({ kind: 'pinOnly' })}
+      onAddPins={() => dispatch({ type: 'applyPins', pins: termStats.matches, mode: 'add' })}
+    />
+  );
+
   return (
     // Overlays and the print view sit OUTSIDE .app-root: print.css blanks
     // .app-root wholesale, and display:none on an ancestor is not undoable
     // from a descendant, so .print-view must be a sibling to print at all.
     <>
     <div className="app-root" ref={rootRef}>
-      <div className="panel-col">
-        <div className="panel-sticky" style={{ marginTop: panelTop }}>
-          <ControlPanel
-            canUndo={state.past.length > 0}
-            canRedo={state.future.length > 0}
-            onFoldAll={() => dispatch({ type: 'foldAll' })}
-            onUnfoldAll={() => dispatch({ type: 'unfoldAll' })}
-            onUndo={() => dispatch({ type: 'undo' })}
-            onRedo={() => dispatch({ type: 'redo' })}
-            onUnpinAll={() => setPendingConfirm({ kind: 'unpinAll' })}
-            onHelp={() => setHelpOpen(true)}
-            onShare={shareView}
-            onExportMarkdown={exportMarkdown}
-            onExportPdf={exportPdf}
-            presets={READING_PATHS}
-            threads={threadsApi.threads}
-            maxThreads={MAX_THREADS}
-            onApplyPreset={(id) => {
-              const p = pathById.get(id);
-              if (p) requestApplyPinSet('path', p.pins, p.name, p.id);
-            }}
-            onApplyThread={(id) => {
-              const t = threadsApi.threads.find((t) => t.id === id);
-              if (t) requestApplyPinSet('thread', t.pins, t.name);
-            }}
-            onSaveThread={(name) => {
-              threadsApi.save(name, [...state.pins]);
-              dispatch({
-                type: 'toast',
-                message: `Thread "${name}" saved — Share (under More) copies a link to this view`,
-              });
-            }}
-            onRenameThread={(id, name) => {
-              threadsApi.rename(id, name);
-              dispatch({ type: 'toast', message: `Thread renamed to "${name}"` });
-            }}
-            onOverwriteThread={(id) => {
-              const t = threadsApi.threads.find((t) => t.id === id);
-              threadsApi.overwrite(id, [...state.pins]);
-              if (t) {
-                dispatch({
-                  type: 'toast',
-                  message:
-                    `Thread "${t.name}" updated — now ` +
-                    `${state.pins.size} pin${state.pins.size === 1 ? '' : 's'}`,
-                });
-              }
-            }}
-            onDeleteThread={(id) => {
-              const t = threadsApi.threads.find((t) => t.id === id);
-              if (t) {
-                setPendingConfirm({
-                  kind: 'deleteThread',
-                  id: t.id,
-                  name: t.name,
-                  pins: t.pins.length,
-                });
-              }
-            }}
-            pinCount={state.pins.size}
-            searchValue={term ?? ''}
-            onSearchChange={setTerm}
-            onClearTerm={() => setTerm('')}
-            termActive={term !== null}
-            termCount={termStats?.occurrences ?? 0}
-            searchRef={searchRef}
-            onSearchLeave={() =>
-              document.querySelector<HTMLElement>('[data-nav]')?.focus()
-            }
-            open={panelOpen}
-            onOpenChange={setPanelOpen}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-            onSaveToLink={syncAvailable() ? saveToLink : undefined}
-          />
-          {term && termStats && (
-            <TermCard
-              term={term}
-              occurrences={termStats.occurrences}
-              statementCount={matchCount}
-              onClear={() => setTerm('')}
-              onPinOnly={() => setPendingConfirm({ kind: 'pinOnly' })}
-              onAddPins={() => dispatch({ type: 'applyPins', pins: termStats.matches, mode: 'add' })}
-            />
-          )}
+      {!mobile && (
+        <div className="panel-col">
+          <div className="panel-sticky" style={{ marginTop: panelTop }}>
+            {panel}
+            {termCard}
+          </div>
         </div>
-      </div>
+      )}
       <ReadingColumn
         display={display}
         pins={state.pins}
@@ -495,6 +512,25 @@ function AppInner() {
       />
       <div className="note-rail" aria-hidden="true" />
     </div>
+    {mobile && (
+      <>
+        {termCard && !sheetOpen && <div className="mobile-term-dock">{termCard}</div>}
+        <MobileBar
+          canUndo={state.past.length > 0}
+          onSearch={() => {
+            setSheetOpen(true);
+            setSearchFocusPending(true);
+          }}
+          onFoldAll={() => dispatch({ type: 'foldAll' })}
+          onUnfoldAll={() => dispatch({ type: 'unfoldAll' })}
+          onUndo={() => dispatch({ type: 'undo' })}
+          onMenu={() => setSheetOpen(true)}
+        />
+        <MobileSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+          {panel}
+        </MobileSheet>
+      </>
+    )}
     <UndoToast
       toast={state.toast}
       onUndo={() => dispatch({ type: 'undo' })}

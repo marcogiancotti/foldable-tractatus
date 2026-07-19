@@ -135,6 +135,13 @@
   user-select: none;
 }
 
+/* the "/" shortcut hint means nothing without a keyboard */
+@media (hover: none) {
+  .cp-search-kbd {
+    display: none;
+  }
+}
+
 .cp-search-count {
   flex: none;
   font-family: var(--font-mono);

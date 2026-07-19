@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { subtreeCount } from '../model/match';
 
 interface Props {
@@ -8,9 +9,6 @@ interface Props {
   onPromote: (members: string[]) => void;
 }
 
-const INDENT_BASE = 4;
-const INDENT_STEP = 30;
-
 export default function PeekRange({ depth, members, label, activeTerm, onPromote }: Props) {
   const title = members.length === 1 ? 'reveal statement' : `reveal ${members.length} statements`;
   const count = activeTerm
@@ -19,13 +17,20 @@ export default function PeekRange({ depth, members, label, activeTerm, onPromote
   return (
     <button
       className="peek-row"
-      style={{ paddingLeft: INDENT_BASE + depth * INDENT_STEP }}
+      style={{ '--depth': depth } as CSSProperties}
       title={title}
       aria-label={`${title}: ${label}`}
       data-nav=""
       data-peek-members={members.join(',')}
       onClick={() => onPromote(members)}
     >
+      {depth > 0 && (
+        <span className="depth-rails" aria-hidden="true">
+          {Array.from({ length: depth }, (_, i) => (
+            <i key={i} />
+          ))}
+        </span>
+      )}
       <span className="peek-toggle msym" aria-hidden="true">
         unfold_more
       </span>

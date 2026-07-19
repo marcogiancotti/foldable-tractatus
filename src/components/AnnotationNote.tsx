@@ -10,7 +10,6 @@ import { NOTE_LIMIT } from '../state/store';
 
 interface Props {
   n: string;
-  indent: number; // the statement row's left padding, for inline alignment
   text: string;
   editing: boolean;
   marginMode: boolean;
@@ -24,7 +23,6 @@ const AUTOSAVE_DEBOUNCE = 600;
 
 export default function AnnotationNote({
   n,
-  indent,
   text,
   editing,
   marginMode,
@@ -77,12 +75,10 @@ export default function AnnotationNote({
     }
   };
 
-  const wrapStyle = marginMode
-    ? undefined
-    : { marginLeft: indent + 92, marginTop: -1, marginBottom: 8 };
-
   return (
-    <div className={`note-wrap ${marginMode ? 'is-margin' : 'is-inline'}`} style={wrapStyle}>
+    // inline alignment (indent + text column) comes from .note-wrap.is-inline,
+    // driven by the row-group's --depth
+    <div className={`note-wrap ${marginMode ? 'is-margin' : 'is-inline'}`}>
       {editing ? (
         <div className="note-edit-box">
           <textarea

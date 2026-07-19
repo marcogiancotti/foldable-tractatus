@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { RowState } from '../model/focusedView';
 import { ownCount, subtreeCount } from '../model/match';
 import { statement } from '../model/tree';
@@ -26,9 +27,6 @@ interface Props {
   onDeleteNote: (n: string) => void;
 }
 
-const INDENT_BASE = 4;
-const INDENT_STEP = 30;
-
 export default function StatementRow({
   n,
   depth,
@@ -52,7 +50,6 @@ export default function StatementRow({
   const s = statement(n);
   const hasChildren = s.children.length > 0;
   const expanded = hasChildren && state === 'full';
-  const indent = INDENT_BASE + depth * INDENT_STEP;
   const hasNote = note !== undefined || noteEditing;
 
   // Occurrences of the active term hidden inside a collapsed subtree (spec §9).
@@ -60,10 +57,10 @@ export default function StatementRow({
     activeTerm && state === 'collapsed' ? subtreeCount(n, activeTerm) - ownCount(n, activeTerm) : 0;
 
   return (
-    <div className="row-group">
+    // --depth drives the padding indent (desktop) and inline-note alignment
+    <div className="row-group" style={{ '--depth': depth } as CSSProperties}>
       <div
         className={`row ${pinned ? 'is-pinned' : ''} ${flash ? 'is-flash' : ''}`}
-        style={{ paddingLeft: indent }}
         tabIndex={-1}
         data-nav=""
         data-n={n}
@@ -71,6 +68,13 @@ export default function StatementRow({
         data-has-children={hasChildren ? '1' : '0'}
         aria-label={`Statement ${n}`}
       >
+        {depth > 0 && (
+          <span className="depth-rails" aria-hidden="true">
+            {Array.from({ length: depth }, (_, i) => (
+              <i key={i} />
+            ))}
+          </span>
+        )}
         <button
           className={`row-toggle msym ${expanded ? 'is-expanded' : ''} ${hasChildren ? '' : 'is-hidden'}`}
           aria-label={expanded ? `Fold statement ${n}` : `Unfold statement ${n}`}
@@ -83,6 +87,8 @@ export default function StatementRow({
         </button>
         <span className="row-num">{n}</span>
         <span className="row-text">
+          {/* mobile: first text line flows around the corner action cluster */}
+          <span className="row-actions-spacer" aria-hidden="true" />
           <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
           {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
         </span>
@@ -94,6 +100,9 @@ export default function StatementRow({
             </span>
           </span>
         )}
+        {/* display:contents on desktop (flex items as before); a floating
+            corner cluster on mobile so text keeps the full column width */}
+        <span className="row-actions">
         {!hasNote && (
           <button
             className="row-note-btn msym"
@@ -121,11 +130,11 @@ export default function StatementRow({
         >
           push_pin
         </button>
+        </span>
       </div>
       {hasNote && (
         <AnnotationNote
           n={n}
-          indent={indent}
           text={note ?? ''}
           editing={noteEditing}
           marginMode={marginMode}
