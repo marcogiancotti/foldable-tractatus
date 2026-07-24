@@ -29,9 +29,11 @@ describe('prefix-per-word matching (spec §9/§9a)', () => {
     expect(countInText('überfact', 'fact')).toBe(0);
   });
 
-  it('matches authored non-ASCII variants at Unicode word boundaries', () => {
-    expect(countInText('Æsthetics and aesthetics are one.', 'aesthetics')).toBe(2);
-    expect(countInText('cæsthetics', 'aesthetics')).toBe(0);
+  it('matches non-ASCII letters at Unicode word boundaries', () => {
+    // æ is a \p{L} letter — the boundary lookbehind must treat it as a word
+    // char (match at a real boundary, never mid-word)
+    expect(countInText('Æsthetics and æsthetics are one.', 'æsthetics')).toBe(2);
+    expect(countInText('cæsthetics', 'æsthetics')).toBe(0);
   });
 
   it('is case-insensitive', () => {

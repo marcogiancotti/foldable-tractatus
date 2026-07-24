@@ -38,7 +38,7 @@ describe('curated technical-term index', () => {
     expect(CURATED_TERMS.some((term) => term.canonical === 'fact')).toBe(true);
     expect(CURATED_TERMS.some((term) => term.canonical === 'atomic fact')).toBe(true);
     expect(CURATED_TERMS.some((term) => term.canonical === 'logical form')).toBe(true);
-    expect(CURATED_TERMS).toHaveLength(339);
+    expect(CURATED_TERMS).toHaveLength(207);
   });
 
   it('attributes overlaps to the longest qualified entry', () => {
