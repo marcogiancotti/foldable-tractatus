@@ -20,13 +20,22 @@
 }
 
 .rc-meta {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 14px;
   margin-top: 30px;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ink60);
+}
+
+/* one group of stats; mobile stacks the reader-contribution group onto its own
+   line (mobile.css) so a growing pin/annotation count can't widen the header */
+.rc-meta-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .rc-meta-dot {
@@ -193,10 +202,6 @@
 /* desktop: the action cluster dissolves into the row's flex layout */
 .row-actions {
   display: contents;
-}
-
-.row-actions-spacer {
-  display: none; /* mobile floats it under the corner cluster (mobile.css) */
 }
 
 .row-pin {

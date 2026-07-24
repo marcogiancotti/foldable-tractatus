@@ -27,6 +27,18 @@
     font-size: 16px;
   }
 
+  /* stats stack: statements/branches on line 1, pins/annotations on line 2 —
+     the contribution count can grow without pushing the page past the screen */
+  .rc-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .rc-meta-sep-groups {
+    display: none;
+  }
+
   .row,
   .peek-row {
     gap: 8px;
@@ -56,10 +68,16 @@
 
   .row-text {
     display: block;
+    /* greedy wrap: the number sits on its own line above, so the text spans the
+       full column — fill each line before wrapping (no rag-balancing that would
+       leave the first line short while there's still room). */
+    text-wrap: auto;
   }
 
-  /* actions float in the row's top-right corner; only the first text line
-     yields to them (the floated spacer), the rest wrap full-width */
+  /* actions sit in the row's top-right corner, on the number's own line (the
+     number is short and left-aligned, so the right side is free) — at top:3px
+     the 20px icons stay within the ~21px number band and clear the text line
+     below, so the text keeps the full column width on every line. */
   .row {
     position: relative;
   }
@@ -69,7 +87,7 @@
     align-items: center;
     gap: 16px;
     position: absolute;
-    top: 8px;
+    top: 3px;
     right: 6px;
   }
 
@@ -78,13 +96,6 @@
   .row-actions .row-pin {
     margin-left: 0;
     transform: none;
-  }
-
-  .row-actions-spacer {
-    display: block;
-    float: right;
-    width: 104px;
-    height: 24px;
   }
 
   .depth-rails {

@@ -120,23 +120,28 @@ export default function ReadingColumn({
           </p>
         </div>
         <div className="rc-meta">
-          <span className="rc-meta-dot" />
-          <span>{STATEMENTS.length} statements</span>
-          <span className="rc-meta-sep">/</span>
-          <span>{ROOT_IDS.length} branches</span>
-          {pins.size > 0 && (
+          <span className="rc-meta-line">
+            <span className="rc-meta-dot" />
+            <span>{STATEMENTS.length} statements</span>
+            <span className="rc-meta-sep">/</span>
+            <span>{ROOT_IDS.length} branches</span>
+          </span>
+          {(pins.size > 0 || annotationCount > 0) && (
             <>
-              <span className="rc-meta-sep">/</span>
-              <span className="rc-meta-accent">
-                {pins.size} pin{pins.size === 1 ? '' : 's'}
-              </span>
-            </>
-          )}
-          {annotationCount > 0 && (
-            <>
-              <span className="rc-meta-sep">/</span>
-              <span className="rc-meta-accent">
-                {annotationCount} annotation{annotationCount === 1 ? '' : 's'}
+              {/* separator between the two groups: on mobile they stack, so it hides */}
+              <span className="rc-meta-sep rc-meta-sep-groups">/</span>
+              <span className="rc-meta-line">
+                {pins.size > 0 && (
+                  <span className="rc-meta-accent">
+                    {pins.size} pin{pins.size === 1 ? '' : 's'}
+                  </span>
+                )}
+                {pins.size > 0 && annotationCount > 0 && <span className="rc-meta-sep">/</span>}
+                {annotationCount > 0 && (
+                  <span className="rc-meta-accent">
+                    {annotationCount} annotation{annotationCount === 1 ? '' : 's'}
+                  </span>
+                )}
               </span>
             </>
           )}

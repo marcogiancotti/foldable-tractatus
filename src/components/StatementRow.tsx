@@ -91,8 +91,6 @@ export default function StatementRow({
         <span className="row-body">
           <span className="row-num">{n}</span>
           <span className="row-text">
-            {/* mobile: first text line flows around the corner action cluster */}
-            <span className="row-actions-spacer" aria-hidden="true" />
             <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
             {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
           </span>
