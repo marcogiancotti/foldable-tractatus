@@ -11,22 +11,9 @@
     --indent-step: 0px; /* rails carry depth; padding indent switches off */
   }
 
-  .app-root {
-    /* tight side gutter so the statement rows use nearly the full width; the
-       header re-pads itself below to keep the title/intro margins comfortable */
-    padding: 0 4px;
-    gap: 0;
-  }
-
-  .reading-col {
-    /* bottom padding keeps the last rows clear of the bar + term card dock */
-    padding: 40px 0 140px;
-  }
-
-  /* title + intro block keeps its roomier inset (rows do not) */
-  .reading-col > header {
-    padding: 0 6px;
-  }
+  /* NOTE: .app-root / .reading-col / header shell padding is set in global.css,
+     not here — global.css re-declares those selectors after @import'ing this
+     file, so overrides placed here would lose the cascade. */
 
   .rc-h1 {
     font-size: 34px;

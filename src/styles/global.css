@@ -58,6 +58,24 @@ body {
   padding: 76px 0 108px;
 }
 
+/* On narrow screens the .app-root side padding IS the whole side margin of the
+   reading column. Halve it (40 → 20) so the statement rows sit closer to the
+   edge, but re-pad the header by the removed 20px so the title/intro block keeps
+   its original inset — only the main text is brought in.
+   This must live in global.css, not mobile.css: global.css re-declares
+   .app-root / .reading-col AFTER @import './mobile.css', so a same-specificity
+   override placed in mobile.css loses the cascade and never applies. */
+@media (max-width: 719px) {
+  .app-root {
+    padding: 0 20px;
+    gap: 0;
+  }
+
+  .reading-col > header {
+    padding: 0 20px;
+  }
+}
+
 .note-rail {
   width: 236px;
   flex: 0 0 auto;
