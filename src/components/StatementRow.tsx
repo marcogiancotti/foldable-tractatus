@@ -90,10 +90,12 @@ export default function StatementRow({
             own line above the text (reclaims horizontal space when nested) */}
         <span className="row-body">
           <span className="row-num">{n}</span>
-          <span className="row-text">
+          {/* div (not span): statement text now contains block-level paragraphs
+              and figure/table blocks */}
+          <div className="row-text">
             <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
             {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
-          </span>
+          </div>
         </span>
         {hiddenCount > 0 && (
           <span className="row-badge-wrap">

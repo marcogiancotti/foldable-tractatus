@@ -240,6 +240,101 @@
   font-size: 1.06em; /* sits well in the 17px/300 body text */
 }
 
+/* ---- multi-paragraph remarks ---- */
+
+.stmt-para {
+  margin: 0;
+}
+.stmt-para + .stmt-para {
+  margin-top: 0.62em;
+}
+
+/* ---- display math & figure/table blocks ---- */
+
+.math-display {
+  display: block;
+  overflow-x: auto;
+}
+.math-display .katex-display {
+  margin: 0.45em 0;
+}
+
+.fig {
+  margin: 0.9em 0;
+  overflow-x: auto;
+}
+.fig-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  color: var(--ink100);
+}
+.fig-tables {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.fig-label,
+.fig-tf {
+  fill: currentColor;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.fig-var {
+  fill: currentColor;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* truth tables (4.31, 4.442) */
+.truthtable {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink100);
+}
+.truthtable th,
+.truthtable td {
+  padding: 2px 11px;
+  text-align: center;
+}
+.truthtable th {
+  font-weight: 400;
+  border-bottom: 1px solid var(--ink24);
+}
+.tt-var {
+  font-style: italic;
+}
+.truthtable .tt-quote {
+  border: none;
+  font-family: var(--font-mono);
+}
+
+/* the sixteen truth-functions (5.101) */
+.fnlist {
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink100);
+}
+.fnlist td {
+  padding: 1px 7px;
+  vertical-align: baseline;
+}
+.fn-tuple,
+.fn-pair {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.fn-tf {
+  padding: 0 1.5px;
+}
+.fn-label {
+  color: var(--ink60);
+  white-space: nowrap;
+}
+
 /* ---- inline term marks & active-term highlight ---- */
 
 .idx-term {

@@ -6,7 +6,15 @@
 
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mount the app over the frozen 25-node fixture so these behavioural assertions
+// (specific ids, the 2.12–2.14 peek range) stay valid independent of the full text.
+vi.mock('./model/tree', async (importActual) => {
+  const actual = await importActual<typeof import('./model/tree')>();
+  const { SAMPLE_TREE } = await import('./model/__fixtures__/sampleTree');
+  return { ...actual, ...actual.buildTree(SAMPLE_TREE) };
+});
 
 beforeAll(() => {
   // jsdom lacks matchMedia/scrollTo; the app only needs their shape.

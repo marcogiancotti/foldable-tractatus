@@ -1,16 +1,19 @@
 /*
   Statement text pipeline (spec §9/§9a): curated terms are marked inline and
   clickable; every word matching the active term gets the accent-wash highlight.
-  Text is always rendered as text content — never markup — except `$…$` math
-  segments, which are curated data typeset by KaTeX (see MathText) and are
-  excluded from term marking.
+  Prose is rendered as text content — never markup — except `$…$`/`$$…$$` math
+  (typeset by KaTeX), `\emph{…}` emphasis, and `[[block:ID]]` figure/table
+  sentinels (rendered by src/components/blocks). Paragraphs (blank-line
+  separated) become block <p>s; term marking applies to plain and emphasized
+  prose alike.
 */
 
 import { useMemo } from 'react';
 import { CURATED_TERMS } from '../data/terms';
-import { splitMath } from '../lib/math';
+import { parseStatement, type Segment } from '../lib/math';
 import { escapeRegExp, termRegex } from '../model/match';
-import { MathSpan } from './MathText';
+import { MathSpan } from './MathSpan';
+import { BlockView } from './blocks';
 
 interface Props {
   text: string;
@@ -58,46 +61,68 @@ function tokenize(text: string, activeTerm: string | null): Token[] {
   return tokens;
 }
 
-export default function StatementText({ text, activeTerm, onSelectTerm }: Props) {
-  const segments = useMemo(
-    () =>
-      splitMath(text).map((seg) => ({
-        ...seg,
-        tokens: seg.math ? [] : tokenize(seg.value, activeTerm),
-      })),
-    [text, activeTerm],
+function renderTokens(text: string, activeTerm: string | null, onSelectTerm: Props['onSelectTerm']) {
+  return tokenize(text, activeTerm).map((t, i) => {
+    if (t.canonical) {
+      return (
+        <button
+          key={i}
+          className={`idx-term ${t.hit ? 'is-hit' : ''}`}
+          title={`trace "${t.canonical}"`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectTerm(t.canonical!);
+          }}
+        >
+          {t.text}
+        </button>
+      );
+    }
+    if (t.hit) {
+      return (
+        <span key={i} className="term-hit">
+          {t.text}
+        </span>
+      );
+    }
+    return <span key={i}>{t.text}</span>;
+  });
+}
+
+function Prose({
+  segments,
+  activeTerm,
+  onSelectTerm,
+}: { segments: Segment[] } & Omit<Props, 'text'>) {
+  return (
+    <p className="stmt-para">
+      {segments.map((seg, si) =>
+        seg.kind === 'math' ? (
+          <MathSpan key={si} latex={seg.value} display={seg.display} />
+        ) : seg.kind === 'emph' ? (
+          <em key={si}>{renderTokens(seg.value, activeTerm, onSelectTerm)}</em>
+        ) : (
+          <span key={si}>{renderTokens(seg.value, activeTerm, onSelectTerm)}</span>
+        ),
+      )}
+    </p>
   );
+}
+
+export default function StatementText({ text, activeTerm, onSelectTerm }: Props) {
+  const paragraphs = useMemo(() => parseStatement(text), [text]);
   return (
     <>
-      {segments.map((seg, si) =>
-        seg.math ? (
-          <MathSpan key={si} latex={seg.value} />
+      {paragraphs.map((para, pi) =>
+        para.kind === 'block' ? (
+          <BlockView key={pi} id={para.id} />
         ) : (
-          seg.tokens.map((t, i) => {
-            if (t.canonical) {
-              return (
-                <button
-                  key={`${si}-${i}`}
-                  className={`idx-term ${t.hit ? 'is-hit' : ''}`}
-                  title={`trace "${t.canonical}"`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectTerm(t.canonical!);
-                  }}
-                >
-                  {t.text}
-                </button>
-              );
-            }
-            if (t.hit) {
-              return (
-                <span key={`${si}-${i}`} className="term-hit">
-                  {t.text}
-                </span>
-              );
-            }
-            return t.text;
-          })
+          <Prose
+            key={pi}
+            segments={para.segments}
+            activeTerm={activeTerm}
+            onSelectTerm={onSelectTerm}
+          />
         ),
       )}
     </>

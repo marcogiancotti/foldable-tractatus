@@ -1,4 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Run against the frozen 25-node fixture so counts don't shift with the full text.
+vi.mock('./tree', async (importActual) => {
+  const actual = await importActual<typeof import('./tree')>();
+  const { SAMPLE_TREE } = await import('./__fixtures__/sampleTree');
+  return { ...actual, ...actual.buildTree(SAMPLE_TREE) };
+});
+
 import { countInText, matchingStatements, subtreeCount, termRegex, variantsFor } from './match';
 import { STATEMENTS } from './tree';
 

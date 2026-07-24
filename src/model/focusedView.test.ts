@@ -1,4 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Run derivation against the frozen 25-node fixture so the worked-example
+// assertions below stay valid independent of the full ~526-statement text.
+vi.mock('./tree', async (importActual) => {
+  const actual = await importActual<typeof import('./tree')>();
+  const { SAMPLE_TREE } = await import('./__fixtures__/sampleTree');
+  return { ...actual, ...actual.buildTree(SAMPLE_TREE) };
+});
+
 import {
   deriveDisplay,
   deriveFlat,
