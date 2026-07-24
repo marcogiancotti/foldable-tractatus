@@ -286,6 +286,11 @@
   font-size: 14px;
   font-style: italic;
 }
+/* the 6.1203 ab-notation figures render at natural size, centered — the
+   narrow ~ξ one would otherwise sit flush left of the column */
+.fig-ab {
+  margin-inline: auto;
+}
 
 /* truth tables (4.31, 4.442) */
 .truthtable {
