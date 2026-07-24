@@ -95,7 +95,7 @@ _(Removed: styled-HTML export — PDF covers the print/read-outside case more co
 ## 9. Technical terms (curated, surfaced inline)
 
 - The app carries a **hand-curated index** of the Tractatus's technical vocabulary. There is **no** automatic click-any-word concordance, and **no separate glossary section, list, or panel**.
-- The curated data records, for each term, its **canonical form, its variant forms** (singular/plural, abbreviations, alternative renderings), and the **set of statements** in which it or a variant occurs. Building this index is a careful build-time analysis of the whole text (method and scope deferred — Section 14).
+- The curated data records, for each term, its **canonical form and variant forms** (inflection stems, abbreviations, alternative renderings). The app derives the set of matching statements from the fixed text, so occurrence data cannot drift from the corpus. Building the index is a careful analysis of the whole text (method and scope — Section 14).
 - Terms are marked **unobtrusively inline within the statement text itself**. The reader activates the feature by clicking a marked term where it appears in the text.
 - Activating a term:
   - **Highlights every visible occurrence** across the tree.
@@ -139,7 +139,7 @@ _(Removed: styled-HTML export — PDF covers the print/read-outside case more co
 
 1. **Peek treatment** — four-state model tentatively approved; settle exactly how quiet a peek is (full sibling row vs. a compact "N more" indicator) during design.
 2. ~~**Annotation length cap**~~ — resolved 2026-07-10: confirmed at **1,000 characters** (Section 6).
-3. **Glossary/term construction** — method and scope of the build-time term analysis; deferred.
+3. ~~**Glossary/term construction**~~ — resolved 2026-07-24: curate the English Ogden text by hand, include vocabulary that defines or structures the framework, and give independently meaningful qualified terms their own lemma-form entries. Proper names, incidental examples, and ordinary prose are excluded.
 4. **Cloud sync** — abuse posture defined; remaining work is to confirm concrete caps/TTL and monitor for abuse, escalating to a write barrier only if needed.
 
 ## 15. Non-goals (for now)

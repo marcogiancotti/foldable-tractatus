@@ -35,10 +35,9 @@ Full functional spec: [`docs/foldable-tractatus-spec.md`](docs/foldable-tractatu
 
 ## Status
 
-The statement tree currently ships a curated 25-statement subset (the one the
-design reference uses). The full ~525-statement text, the real cross-reference
-set, and the complete curated term index are a planned data task — the code
-paths are already built for them (`src/data/`).
+The app ships the complete 526-statement Ogden text, Wittgenstein's in-text
+cross-references, and a hand-curated index of the technical vocabulary used to
+build the book's framework.
 
 ## Development
 

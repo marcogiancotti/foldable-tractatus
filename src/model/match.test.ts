@@ -15,8 +15,23 @@ describe('prefix-per-word matching (spec §9/§9a)', () => {
     expect(countInText('The picture presents pictures, pictorially.', 'picture')).toBe(3);
   });
 
+  it('matches qualified terms across whitespace and emphasis boundaries', () => {
+    expect(countInText('an atomic\nfact and another atomic \\emph{fact}', 'atomic fact')).toBe(2);
+  });
+
+  it('does not match a qualified term across math or paragraph boundaries', () => {
+    expect(countInText('atomic $p$ fact', 'atomic fact')).toBe(0);
+    expect(countInText('atomic\n\nfact', 'atomic fact')).toBe(0);
+  });
+
   it('does not match mid-word', () => {
-    expect(countInText('depicture', 'picture')).toBe(0);
+    expect(countInText('outpicture', 'picture')).toBe(0);
+    expect(countInText('überfact', 'fact')).toBe(0);
+  });
+
+  it('matches authored non-ASCII variants at Unicode word boundaries', () => {
+    expect(countInText('Æsthetics and aesthetics are one.', 'aesthetics')).toBe(2);
+    expect(countInText('cæsthetics', 'aesthetics')).toBe(0);
   });
 
   it('is case-insensitive', () => {

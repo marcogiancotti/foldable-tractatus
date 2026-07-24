@@ -91,3 +91,14 @@ export function stripMath(text: string): string {
     )
     .join(' ');
 }
+
+/** Prose used for matching; boundaries prevent phrases spanning math/blocks. */
+export function proseForMatching(text: string): string {
+  return parseStatement(text)
+    .map((p) =>
+      p.kind === 'block'
+        ? '\0'
+        : p.segments.map((s) => (s.kind === 'math' ? '\0' : s.value)).join(''),
+    )
+    .join('\0');
+}

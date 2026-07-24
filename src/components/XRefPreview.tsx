@@ -17,13 +17,14 @@ import MathText from './MathText';
 interface RefLinkProps {
   target: string;
   onNavigate: (n: string) => void;
+  hit?: boolean;
 }
 
 const POP_WIDTH = 304;
 const GAP = 9;
 const MARGIN = 12;
 
-export function RefLink({ target, onNavigate }: RefLinkProps) {
+export function RefLink({ target, onNavigate, hit = false }: RefLinkProps) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
   // The popover is portalled to <body>: it carries block content (paragraphs,
@@ -91,7 +92,7 @@ export function RefLink({ target, onNavigate }: RefLinkProps) {
       <button
         ref={btnRef}
         type="button"
-        className={`xref-num${open ? ' is-open' : ''}`}
+        className={`xref-num${open ? ' is-open' : ''}${hit ? ' term-hit' : ''}`}
         aria-expanded={open}
         aria-label={`preview statement ${target}`}
         title={`preview ${target}`}

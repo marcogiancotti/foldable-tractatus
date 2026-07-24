@@ -14,10 +14,10 @@
   back to that appended form.
 */
 
-import { useMemo } from 'react';
-import { CURATED_TERMS } from '../data/terms';
+import { useMemo, type ReactNode } from 'react';
+import { CURATED_TERMS, curatedTermForMatch } from '../data/terms';
 import { parseStatement, type Paragraph, type Segment } from '../lib/math';
-import { escapeRegExp, termRegex } from '../model/match';
+import { escapeRegExp, termRegex, variantPattern } from '../model/match';
 import { MathSpan } from './MathSpan';
 import { BlockView } from './blocks';
 import XRefPreview, { RefLink } from './XRefPreview';
@@ -32,14 +32,10 @@ interface Props {
 
 // One regex over all curated stems, longest first so attribution is exact.
 const ALL_STEMS = CURATED_TERMS.flatMap((t) => t.variants).sort((a, b) => b.length - a.length);
-const INDEX_RE_SRC = `\\b(?:${ALL_STEMS.map(escapeRegExp).join('|')})[a-z]*`;
+const INDEX_RE_SRC = `(?<![\\p{L}\\p{N}_])(?:${ALL_STEMS.map(variantPattern).join('|')})[a-z]*`;
 
 function canonicalForWord(word: string): string | null {
-  const w = word.toLowerCase();
-  for (const t of CURATED_TERMS) {
-    if (t.variants.some((v) => w.startsWith(v))) return t.canonical;
-  }
-  return null;
+  return curatedTermForMatch(word)?.canonical ?? null;
 }
 
 // Alternation for this statement's ref numbers, longest-first, bounded so a
@@ -48,7 +44,7 @@ function canonicalForWord(word: string): string | null {
 function refAltSrc(refs: string[]): string {
   if (!refs.length) return '';
   const alt = [...refs].sort((a, b) => b.length - a.length).map(escapeRegExp).join('|');
-  return `|(?<![\\d.])(?:${alt})(?![\\d.])`;
+  return `|(?<![\\d.])(?:${alt})(?!\\d|\\.\\d)`;
 }
 
 interface Token {
@@ -58,51 +54,126 @@ interface Token {
   ref: string | null; // statement number → clickable cross-ref
 }
 
+// Only three statements have refs. Cache the large curated alternation instead
+// of compiling it once per prose paragraph.
+const tokenRegexCache = new Map<string, RegExp>();
+
+function tokenRegex(refs: string[]): RegExp {
+  const key = refs.join(',');
+  const cached = tokenRegexCache.get(key);
+  if (cached) return cached;
+  const regex = new RegExp(`${INDEX_RE_SRC}${refAltSrc(refs)}`, 'giu');
+  tokenRegexCache.set(key, regex);
+  return regex;
+}
+
+interface MatchRange {
+  start: number;
+  end: number;
+}
+
+function overlaps(start: number, end: number, ranges: MatchRange[]): boolean {
+  return ranges.some((range) => range.start < end && range.end > start);
+}
+
 function tokenize(text: string, activeTerm: string | null, refs: string[]): Token[] {
   const active = activeTerm ? termRegex(activeTerm) : null;
-  const activeSrc = active ? `|${active.source}` : '';
-  const union = new RegExp(`${INDEX_RE_SRC}${activeSrc}${refAltSrc(refs)}`, 'gi');
-  const isHit = (w: string) => {
-    if (!active) return false;
-    const anchored = new RegExp(`^(?:${active.source})$`, 'i');
-    return anchored.test(w);
-  };
+  const activeRanges: MatchRange[] = [];
+  if (active) {
+    active.lastIndex = 0;
+    for (const match of text.matchAll(active)) {
+      activeRanges.push({ start: match.index, end: match.index + match[0].length });
+    }
+  }
+
+  const union = tokenRegex(refs);
 
   const tokens: Token[] = [];
+  const pushPlain = (start: number, end: number) => {
+    if (start >= end) return;
+    const boundaries = new Set([start, end]);
+    for (const range of activeRanges) {
+      if (range.start > start && range.start < end) boundaries.add(range.start);
+      if (range.end > start && range.end < end) boundaries.add(range.end);
+    }
+    const sorted = [...boundaries].sort((a, b) => a - b);
+    for (let i = 1; i < sorted.length; i++) {
+      const from = sorted[i - 1];
+      const to = sorted[i];
+      tokens.push({
+        text: text.slice(from, to),
+        canonical: null,
+        hit: overlaps(from, to, activeRanges),
+        ref: null,
+      });
+    }
+  };
+
   let last = 0;
+  union.lastIndex = 0;
   for (const m of text.matchAll(union)) {
     const i = m.index;
-    if (i > last)
-      tokens.push({ text: text.slice(last, i), canonical: null, hit: false, ref: null });
+    pushPlain(last, i);
     const isRef = refs.includes(m[0]);
     tokens.push({
       text: m[0],
       canonical: isRef ? null : canonicalForWord(m[0]),
-      hit: isRef ? false : isHit(m[0]),
+      hit: overlaps(i, i + m[0].length, activeRanges),
       ref: isRef ? m[0] : null,
     });
     last = i + m[0].length;
   }
-  if (last < text.length)
-    tokens.push({ text: text.slice(last), canonical: null, hit: false, ref: null });
+  pushPlain(last, text.length);
   return tokens;
 }
 
-function renderTokens(
-  text: string,
+interface StyledPiece {
+  text: string;
+  emph: boolean;
+}
+
+function sliceStyled(parts: StyledPiece[], start: number, length: number): StyledPiece[] {
+  const pieces: StyledPiece[] = [];
+  const end = start + length;
+  let offset = 0;
+  for (const part of parts) {
+    const partEnd = offset + part.text.length;
+    const from = Math.max(start, offset);
+    const to = Math.min(end, partEnd);
+    if (from < to) pieces.push({ text: part.text.slice(from - offset, to - offset), emph: part.emph });
+    offset = partEnd;
+    if (offset >= end) break;
+  }
+  return pieces;
+}
+
+function renderPieces(pieces: StyledPiece[]): ReactNode[] {
+  return pieces.map((piece, i) =>
+    piece.emph ? <em key={i}>{piece.text}</em> : <span key={i}>{piece.text}</span>,
+  );
+}
+
+function renderStyledRun(
+  parts: StyledPiece[],
   activeTerm: string | null,
   onSelectTerm: Props['onSelectTerm'],
   refs: string[],
+  keyPrefix: string,
   onNavigate?: Props['onNavigate'],
 ) {
+  const text = parts.map((part) => part.text).join('');
+  let offset = 0;
   return tokenize(text, activeTerm, refs).map((t, i) => {
+    const pieces = sliceStyled(parts, offset, t.text.length);
+    offset += t.text.length;
+    const key = `${keyPrefix}-${i}`;
     if (t.ref && onNavigate) {
-      return <RefLink key={i} target={t.ref} onNavigate={onNavigate} />;
+      return <RefLink key={key} target={t.ref} onNavigate={onNavigate} hit={t.hit} />;
     }
     if (t.canonical) {
       return (
         <button
-          key={i}
+          key={key}
           className={`idx-term ${t.hit ? 'is-hit' : ''}`}
           title={`trace "${t.canonical}"`}
           onClick={(e) => {
@@ -110,18 +181,18 @@ function renderTokens(
             onSelectTerm(t.canonical!);
           }}
         >
-          {t.text}
+          {renderPieces(pieces)}
         </button>
       );
     }
     if (t.hit) {
       return (
-        <span key={i} className="term-hit">
-          {t.text}
+        <span key={key} className="term-hit">
+          {renderPieces(pieces)}
         </span>
       );
     }
-    return <span key={i}>{t.text}</span>;
+    return <span key={key}>{renderPieces(pieces)}</span>;
   });
 }
 
@@ -130,16 +201,23 @@ function renderTokens(
 function inlineRefs(paragraphs: Paragraph[], refs: string[]): Set<string> {
   if (!refs.length) return new Set();
   const re = new RegExp(
-    `(?<![\\d.])(?:${[...refs].sort((a, b) => b.length - a.length).map(escapeRegExp).join('|')})(?![\\d.])`,
+    `(?<![\\d.])(?:${[...refs].sort((a, b) => b.length - a.length).map(escapeRegExp).join('|')})(?!\\d|\\.\\d)`,
     'g',
   );
   const found = new Set<string>();
   for (const p of paragraphs) {
     if (p.kind !== 'prose') continue;
+    let run = '';
+    const flush = () => {
+      re.lastIndex = 0;
+      for (const m of run.matchAll(re)) found.add(m[0]);
+      run = '';
+    };
     for (const seg of p.segments) {
-      if (seg.kind === 'math') continue;
-      for (const m of seg.value.matchAll(re)) found.add(m[0]);
+      if (seg.kind === 'math') flush();
+      else run += seg.value;
     }
+    flush();
   }
   return found;
 }
@@ -151,18 +229,26 @@ function Prose({
   refs,
   onNavigate,
 }: { segments: Segment[]; refs: string[] } & Omit<Props, 'text' | 'refs'>) {
+  const content: ReactNode[] = [];
+  let run: StyledPiece[] = [];
+  let key = 0;
+  const flush = () => {
+    if (!run.length) return;
+    content.push(...renderStyledRun(run, activeTerm, onSelectTerm, refs, `run-${key++}`, onNavigate));
+    run = [];
+  };
+  for (const seg of segments) {
+    if (seg.kind === 'math') {
+      flush();
+      content.push(<MathSpan key={`math-${key++}`} latex={seg.value} display={seg.display} />);
+    } else {
+      run.push({ text: seg.value, emph: seg.kind === 'emph' });
+    }
+  }
+  flush();
+
   return (
-    <p className="stmt-para">
-      {segments.map((seg, si) =>
-        seg.kind === 'math' ? (
-          <MathSpan key={si} latex={seg.value} display={seg.display} />
-        ) : seg.kind === 'emph' ? (
-          <em key={si}>{renderTokens(seg.value, activeTerm, onSelectTerm, refs, onNavigate)}</em>
-        ) : (
-          <span key={si}>{renderTokens(seg.value, activeTerm, onSelectTerm, refs, onNavigate)}</span>
-        ),
-      )}
-    </p>
+    <p className="stmt-para">{content}</p>
   );
 }
 
