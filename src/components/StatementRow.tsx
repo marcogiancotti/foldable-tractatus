@@ -85,12 +85,17 @@ export default function StatementRow({
         >
           chevron_right
         </button>
-        <span className="row-num">{n}</span>
-        <span className="row-text">
-          {/* mobile: first text line flows around the corner action cluster */}
-          <span className="row-actions-spacer" aria-hidden="true" />
-          <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
-          {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
+        {/* display:contents on desktop (row-num + row-text stay inline flex
+            siblings); mobile.css makes this a block so the number sits on its
+            own line above the text (reclaims horizontal space when nested) */}
+        <span className="row-body">
+          <span className="row-num">{n}</span>
+          <span className="row-text">
+            {/* mobile: first text line flows around the corner action cluster */}
+            <span className="row-actions-spacer" aria-hidden="true" />
+            <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
+            {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
+          </span>
         </span>
         {hiddenCount > 0 && (
           <span className="row-badge-wrap">

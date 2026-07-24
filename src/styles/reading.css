@@ -165,6 +165,12 @@
   cursor: default;
 }
 
+/* transparent on desktop: row-num + row-text stay direct flex children of .row
+   exactly as before. mobile.css turns this into a stacking block. */
+.row-body {
+  display: contents;
+}
+
 .row-num {
   flex: none;
   min-width: 44px;

@@ -12,13 +12,20 @@
   }
 
   .app-root {
-    padding: 0 10px;
+    /* tight side gutter so the statement rows use nearly the full width; the
+       header re-pads itself below to keep the title/intro margins comfortable */
+    padding: 0 4px;
     gap: 0;
   }
 
   .reading-col {
     /* bottom padding keeps the last rows clear of the bar + term card dock */
     padding: 40px 0 140px;
+  }
+
+  /* title + intro block keeps its roomier inset (rows do not) */
+  .reading-col > header {
+    padding: 0 6px;
   }
 
   .rc-h1 {
@@ -35,8 +42,22 @@
     padding-right: 4px;
   }
 
+  /* number on its own line, above the text — reclaims the horizontal band the
+     inline number column used to take from deeply-nested text */
+  .row-body {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .row-num {
     min-width: 0;
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  .row-text {
+    display: block;
   }
 
   /* actions float in the row's top-right corner; only the first text line
