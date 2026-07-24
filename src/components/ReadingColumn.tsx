@@ -17,7 +17,7 @@ interface Props {
   onPromote: (members: string[]) => void;
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
-  onNavigate: (n: string) => void;
+  onNavigate: (target: string, origin?: string) => void;
   onShare: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;

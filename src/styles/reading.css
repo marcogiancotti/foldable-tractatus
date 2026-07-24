@@ -334,6 +334,19 @@
   color: var(--ink60);
   white-space: nowrap;
 }
+/* The sixteen-function table is the widest block in the book. Let it reclaim
+   the row's depth indent and bleed a little past the prose column so its rows
+   don't stack; .fig's overflow-x:auto still lets narrow viewports scroll.
+   (Mobile: --indent-step is 0, so this is a no-op there.) */
+.fig-fnlist {
+  margin-left: calc(-1 * var(--depth, 0) * var(--indent-step));
+  max-width: calc(100% + var(--depth, 0) * var(--indent-step));
+}
+/* Table keeps its natural width; the container above scrolls when it can't fit
+   (mobile), and on desktop the reclaimed indent gives it room not to wrap. */
+.fig-fnlist .fnlist {
+  width: max-content;
+}
 
 /* ---- inline term marks & active-term highlight ---- */
 

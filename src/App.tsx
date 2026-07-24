@@ -3,6 +3,7 @@ import ConfirmModal, { type ConfirmRequest } from './components/ConfirmModal';
 import ControlPanel from './components/ControlPanel';
 import { MobileBar, MobileSheet } from './components/MobileControls';
 import ReadingColumn from './components/ReadingColumn';
+import ReturnPill from './components/ReturnPill';
 import TermCard from './components/TermCard';
 import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
@@ -70,9 +71,20 @@ function AppInner() {
   const [flashN, setFlashN] = useState<string | null>(null);
   const [pendingScroll, setPendingScroll] = useState<string | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const navigateToStatement = (n: string) => {
-    dispatch({ type: 'reveal', n });
+  // The statement to offer a "back to N" return to, after a cross-ref jump.
+  // Deliberately local state — kept off the undo stack and browser history (§12).
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  const navigateToStatement = (target: string, origin?: string) => {
+    dispatch({ type: 'reveal', n: target });
+    setPendingScroll(target);
+    setReturnTo(origin && origin !== target ? origin : null);
+  };
+  // Return to the statement the reader followed the link from. `reveal` only
+  // ever *expands*, so the origin is still on screen — a plain scroll suffices
+  // (no dispatch, so this doesn't pollute the undo history).
+  const returnToStatement = (n: string) => {
     setPendingScroll(n);
+    setReturnTo(null);
   };
   useEffect(() => {
     if (!pendingScroll) return;
@@ -535,6 +547,11 @@ function AppInner() {
       toast={state.toast}
       onUndo={() => dispatch({ type: 'undo' })}
       onDismiss={() => dispatch({ type: 'dismissToast' })}
+    />
+    <ReturnPill
+      target={returnTo}
+      onReturn={() => returnTo && returnToStatement(returnTo)}
+      onDismiss={() => setReturnTo(null)}
     />
     <ReaderGuide open={helpOpen} onClose={() => setHelpOpen(false)} />
     <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />

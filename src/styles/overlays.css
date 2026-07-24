@@ -76,6 +76,46 @@
   transform-origin: left;
 }
 
+/* ---- "back to N" return pill (after a cross-ref jump) ---- */
+
+.return-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 60;
+}
+
+.return-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  border: none;
+  border-radius: var(--radius);
+  padding: 9px 16px 10px 12px;
+  box-shadow: var(--shadow-overlay);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  cursor: pointer;
+  animation: toast-in 240ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.return-pill:hover {
+  background: color-mix(in srgb, var(--toast-bg) 86%, var(--accent));
+}
+
+.return-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.return-arrow {
+  font-size: 18px;
+  opacity: 0.78;
+}
+
 /* ---- confirm modal ---- */
 
 .modal-scrim {

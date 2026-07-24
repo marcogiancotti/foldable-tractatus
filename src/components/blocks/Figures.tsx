@@ -30,11 +30,23 @@ export function Cube() {
         {diag.map(([a, b], i) => (
           <line key={i} {...S} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />
         ))}
-        {front.map((p, i) => (
-          <text key={`a${i}`} className="fig-label" x={p[0]} y={p[1]} dx={-6} dy={14}>
-            a
-          </text>
-        ))}
+        {front.map((p, i) => {
+          // front = [bottom-left, bottom-right, top-right, top-left]; the two
+          // upper corners (2, 3) get their label above the corner, not below.
+          const upper = i === 2 || i === 3;
+          return (
+            <text
+              key={`a${i}`}
+              className="fig-label"
+              x={p[0]}
+              y={p[1]}
+              dx={-6}
+              dy={upper ? -6 : 14}
+            >
+              a
+            </text>
+          );
+        })}
         {back.map((p, i) => (
           <text key={`b${i}`} className="fig-label" x={p[0]} y={p[1]} dx={4} dy={-4}>
             b
@@ -53,9 +65,11 @@ export function Eye() {
         <text className="fig-label" x={8} y={69}>
           Eye
         </text>
-        <line {...S} x1={40} y1={65} x2={58} y2={65} />
-        <circle {...S} cx={66} cy={65} r={7} />
-        <path {...S} d="M 78 62 C 150 20 150 110 78 70" />
+        <line {...S} x1={40} y1={65} x2={60} y2={65} />
+        {/* small eye-point; the large reversed-C (visual field) meets it: the
+            arc's two tips sit on the circle's right edge (both 5 from centre). */}
+        <circle {...S} cx={66} cy={65} r={5} />
+        <path {...S} d="M 70 62 C 195 10, 195 120, 70 68" />
       </svg>
     </div>
   );

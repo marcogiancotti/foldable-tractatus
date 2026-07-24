@@ -29,7 +29,7 @@ ZERO_ARG = {
     r"\rand": r"\mathrel{.}",
     r"\rimplies": r"\supset",
     r"\nop": r"\mathop{\mathrm{N}}",
-    r"\Op": r"\mathop{\text{O'}}",
+    r"\Op": r"\mathop{\mathrm{O}'}",  # real math prime, not a text apostrophe (comma-like)
     r"\sheffer": r"\mathrel{\vert}",
     r"\ddrimpliesdd": r"\mathrel{\mathord{:}\mathord{\supset}\mathord{:}}",
     r"\drimpliesd": r"\mathrel{\mathord{.}\mathord{\supset}\mathord{.}}",
@@ -111,13 +111,16 @@ def expand_omop(s):
         x, i = opt(s, m.end())
         assert s[i] == "{"
         y, end = read_braced(s, i)
-        s = s[: m.start()] + r"\mathop{(\mathord{\Omega}^{" + x + r"})^{" + y + r"}\mathord{\text{'}}}" + s[end:]
+        s = s[: m.start()] + r"\mathop{(\mathord{\Omega}^{" + x + r"})^{" + y + r"}{}^{\prime}}" + s[end:]
     while True:
         m = re.search(r"\\omop(?![A-Za-z])", s)
         if not m:
             break
         x, end = opt(s, m.end())
-        s = s[: m.start()] + r"\mathop{\mathord{\Omega}^{" + x + r"}\mathord{\text{'}}}" + s[end:]
+        s = s[: m.start()] + r"\mathop{\mathord{\Omega}^{" + x + r"}{}^{\prime}}" + s[end:]
+        # NOTE: a standalone prime atom {}^{\prime} (not \mathord{\text{'}}) — the
+        # text-mode apostrophe renders comma-like; this places a real math prime
+        # without a double-superscript error after ^{...}.
     return s
 
 

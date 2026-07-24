@@ -6,6 +6,11 @@
   white-space: nowrap;
 }
 
+/* A ref number linked in place within prose (not the "(cf. N)" fallback). */
+.xref-inline {
+  display: inline;
+}
+
 .xref-quiet {
   color: var(--ink40);
 }
@@ -55,6 +60,13 @@
   animation: xref-in 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
+/* Portalled to <body> (so it can hold block content without breaking the prose
+   <p>): fixed to the viewport, positioned inline from the number's rect. */
+.xref-pop-fixed {
+  position: fixed;
+  z-index: 45;
+}
+
 @keyframes xref-in {
   from {
     opacity: 0;
@@ -80,6 +92,10 @@
   line-height: 1.5;
   color: var(--ink100);
   text-wrap: pretty;
+  /* A preview, not the whole statement: cap tall targets (e.g. the 5.101 table)
+     and scroll internally so the "Go to" link below always stays reachable. */
+  max-height: 44vh;
+  overflow-y: auto;
 }
 
 .xref-pop-sep {

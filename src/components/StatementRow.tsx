@@ -4,7 +4,6 @@ import { ownCount, subtreeCount } from '../model/match';
 import { statement } from '../model/tree';
 import AnnotationNote from './AnnotationNote';
 import StatementText from './StatementText';
-import XRefPreview from './XRefPreview';
 
 interface Props {
   n: string;
@@ -19,7 +18,7 @@ interface Props {
   onToggle: (n: string, expand: boolean) => void;
   onPin: (n: string) => void;
   onSelectTerm: (canonical: string) => void;
-  onNavigate: (n: string) => void;
+  onNavigate: (target: string, origin?: string) => void;
   onShare: (n: string) => void;
   onStartEditNote: (n: string) => void;
   onCommitNote: (n: string, text: string) => void;
@@ -93,8 +92,15 @@ export default function StatementRow({
           {/* div (not span): statement text now contains block-level paragraphs
               and figure/table blocks */}
           <div className="row-text">
-            <StatementText text={s.text} activeTerm={activeTerm} onSelectTerm={onSelectTerm} />
-            {s.refs.length > 0 && <XRefPreview refs={s.refs} onNavigate={onNavigate} />}
+            {/* cross-ref numbers are linked in place; the containing statement's
+                own number rides along as the "back to N" origin */}
+            <StatementText
+              text={s.text}
+              activeTerm={activeTerm}
+              onSelectTerm={onSelectTerm}
+              refs={s.refs}
+              onNavigate={(target) => onNavigate(target, n)}
+            />
           </div>
         </span>
         {hiddenCount > 0 && (
