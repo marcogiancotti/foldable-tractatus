@@ -156,7 +156,7 @@ export function Table5_101() {
                 ))})
               </td>
               <td className="fn-pair">
-                <MathSpan latex="(p,\\ q)" />
+                <MathSpan latex="(p,\ q)" />
               </td>
               <td className="fn-label">{fn.label}</td>
               <td className="fn-words">

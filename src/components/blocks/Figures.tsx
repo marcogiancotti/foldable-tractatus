@@ -61,15 +61,16 @@ export function Cube() {
 export function Eye() {
   return (
     <div className="fig">
-      <svg className="fig-svg" viewBox="0 0 200 130" role="img" aria-label="An eye and a curved boundary">
-        <text className="fig-label" x={8} y={69}>
+      <svg className="fig-svg" viewBox="0 0 200 120" role="img" aria-label="An eye and a curved boundary">
+        <text className="fig-label" x={8} y={64}>
           Eye
         </text>
-        <line {...S} x1={40} y1={65} x2={60} y2={65} />
+        <line {...S} x1={40} y1={60} x2={60} y2={60} />
         {/* small eye-point; the large reversed-C (visual field) meets it: the
-            arc's two tips sit on the circle's right edge (both 5 from centre). */}
-        <circle {...S} cx={66} cy={65} r={5} />
-        <path {...S} d="M 70 62 C 195 10, 195 120, 70 68" />
+            arc's two tips sit on the circle's right edge (both 5 from centre).
+            The balloon is tall — control points spread far above/below centre. */}
+        <circle {...S} cx={66} cy={60} r={5} />
+        <path {...S} d="M 70 57 C 200 -80, 200 200, 70 63" />
       </svg>
     </div>
   );
