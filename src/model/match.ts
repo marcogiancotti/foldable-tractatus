@@ -4,7 +4,7 @@
 */
 
 import { curatedTermFor } from '../data/terms';
-import { stripMath } from '../lib/math';
+import { proseForMatching } from '../lib/math';
 import { statement } from './tree';
 
 export function escapeRegExp(s: string): string {
@@ -19,17 +19,22 @@ export function variantsFor(term: string): string[] {
   return curated ? curated.variants : [q];
 }
 
+/** Regex source for one authored stem; spaces tolerate source line wrapping. */
+export function variantPattern(stem: string): string {
+  return stem.trim().split(/\s+/).map(escapeRegExp).join('\\s+');
+}
+
 /** Global regex matching every word that starts with any of the term's stems. */
 export function termRegex(term: string): RegExp | null {
-  const stems = variantsFor(term);
+  const stems = [...variantsFor(term)].sort((a, b) => b.length - a.length);
   if (!stems.length) return null;
-  return new RegExp(`\\b(?:${stems.map(escapeRegExp).join('|')})[a-z]*`, 'gi');
+  return new RegExp(`(?<![\\p{L}\\p{N}_])(?:${stems.map(variantPattern).join('|')})[a-z]*`, 'giu');
 }
 
 export function countInText(text: string, term: string): number {
   const re = termRegex(term);
   // prose only: $…$ LaTeX source (\bar, \xi, …) must never count as words
-  return re ? (stripMath(text).match(re)?.length ?? 0) : 0;
+  return re ? (proseForMatching(text).match(re)?.length ?? 0) : 0;
 }
 
 /** Occurrences in one statement's own text. */

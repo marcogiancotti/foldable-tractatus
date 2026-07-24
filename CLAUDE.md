@@ -97,11 +97,10 @@ Sync is gated on `VITE_SYNC_ENDPOINT`; unset, the sync UI simply doesn't appear.
 
 ## Data status
 
-The statement tree currently ships a **curated ~25-statement subset** (matching
-the design reference), not the full ~525-statement text. The full text, real
-cross-references, and complete term index are a planned data-only task —
-`src/data/` (`tractatus.ts`, `terms.ts`, `paths.ts`) is the only thing that
-changes for it; all code paths already handle the full tree.
+The statement tree ships the complete **526-statement Ogden text**,
+Wittgenstein's in-text cross-references, and a hand-curated technical-term
+index. The frozen 25-statement tree under `src/model/__fixtures__/` remains only
+as stable test data.
 
 ## Deployment
 
