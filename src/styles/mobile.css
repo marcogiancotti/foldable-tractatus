@@ -45,6 +45,19 @@
     padding-right: 4px;
   }
 
+  /* pinned/flash highlight bleeds edge-to-edge (no rounded corners) so the
+     margin-hung fold chevron falls inside the wash instead of on its border.
+     The negative side margins cancel the .app-root 20px inset; the matching
+     +20px on each padding keeps number/text/chevron/icons in their current
+     spots (net margin -40 = net padding +40, so no horizontal scroll). */
+  .row {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: calc(20px + var(--indent-base) + var(--depth, 0) * var(--indent-step));
+    padding-right: 24px;
+    border-radius: 0;
+  }
+
   /* number on its own line, above the text — reclaims the horizontal band the
      inline number column used to take from deeply-nested text */
   .row-body {
@@ -88,7 +101,7 @@
     gap: 16px;
     position: absolute;
     top: 3px;
-    right: 6px;
+    right: 26px; /* 6 + 20 to offset the row's -20px right margin (full-bleed) */
   }
 
   .row-actions .row-note-btn,
