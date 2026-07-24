@@ -9,6 +9,10 @@
 @media (max-width: 719px) {
   :root {
     --indent-step: 0px; /* rails carry depth; padding indent switches off */
+    /* top-level rows indent by 20px inside the shell — matching the header's
+       own 20px pad — so a depth-0 number sits directly under the title. The
+       fold chevron is pulled back out into the margin (see .row-toggle). */
+    --indent-base: 20px;
   }
 
   /* NOTE: .app-root / .reading-col / header shell padding is set in global.css,
@@ -41,6 +45,13 @@
     min-width: 0;
     display: block;
     margin-bottom: 1px;
+  }
+
+  /* hang the fold chevron in the left margin: the negative margin (toggle
+     width 26 + row gap 8) cancels the space it would otherwise add, so the
+     number/text start at the row's 20px indent — flush under the title. */
+  .row-toggle {
+    margin: 1px 0 0 -34px;
   }
 
   .row-text {
@@ -81,7 +92,7 @@
   }
 
   .note-wrap.is-inline {
-    margin-left: 39px; /* toggle column + gap — notes align with the number */
+    margin-left: 20px; /* line up with the number/text column (row's 20px indent) */
   }
 
   /* anchored popover would overflow the narrow column; span the row instead */
