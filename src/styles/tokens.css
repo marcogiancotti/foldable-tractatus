@@ -56,6 +56,23 @@
   --indent-step: 30px;
 }
 
+:root[data-theme='dark'] {
+  --paper: #181613;
+  --ink100: rgba(233, 230, 223, 1); /* 14.49 */
+  --ink60: rgba(233, 230, 223, 0.6); /*  5.88 — already cleared its floor */
+  --ink40: rgba(233, 230, 223, 0.6); /*  5.88 — text */
+  --ink24: rgba(233, 230, 223, 0.42); /*  3.52 — icon chrome */
+  --accent: #93b4d8; /*  8.39 on paper, 5.62 on --accent-wash */
+  --accent-wash: rgba(140, 170, 205, 0.22);
+  --hover-surface: rgba(233, 230, 223, 0.06);
+  --tap-surface: rgba(233, 230, 223, 0.1);
+  --hairline: rgba(233, 230, 223, 0.12); /* decorative rules only — no floor */
+  --control-border: rgba(233, 230, 223, 0.45); /*  3.85 — control boundaries */
+  --toast-bg: #e9e6df;
+  --toast-fg: #181613;
+  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
 /* Readers who ask their OS for more contrast get it: the quiet chrome and the
    decorative hairlines step up past their floors rather than merely meeting
    them. Declared once, after both themes, using each theme's own ink. */
@@ -75,21 +92,4 @@
     --control-border: rgba(233, 230, 223, 0.75);
     --accent: #b8d2ee;
   }
-}
-
-:root[data-theme='dark'] {
-  --paper: #181613;
-  --ink100: rgba(233, 230, 223, 1); /* 14.49 */
-  --ink60: rgba(233, 230, 223, 0.6); /*  5.88 — already cleared its floor */
-  --ink40: rgba(233, 230, 223, 0.6); /*  5.88 — text */
-  --ink24: rgba(233, 230, 223, 0.42); /*  3.52 — icon chrome */
-  --accent: #93b4d8; /*  8.39 on paper, 5.62 on --accent-wash */
-  --accent-wash: rgba(140, 170, 205, 0.22);
-  --hover-surface: rgba(233, 230, 223, 0.06);
-  --tap-surface: rgba(233, 230, 223, 0.1);
-  --hairline: rgba(233, 230, 223, 0.12); /* decorative rules only — no floor */
-  --control-border: rgba(233, 230, 223, 0.45); /*  3.85 — control boundaries */
-  --toast-bg: #e9e6df;
-  --toast-fg: #181613;
-  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
