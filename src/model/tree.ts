@@ -15,7 +15,6 @@ export interface Tree {
   ROOT_IDS: string[];
   statement: (n: string) => Statement;
   ancestorsOf: (n: string) => string[];
-  descendantsOf: (n: string) => string[];
 }
 
 /**
@@ -60,25 +59,12 @@ export function buildTree(sources: StatementSource[]): Tree {
     return out;
   }
 
-  /** Ids in the subtree rooted at `n`, excluding `n` itself. */
-  function descendantsOf(n: string): string[] {
-    const out: string[] = [];
-    const stack = [...statement(n).children];
-    while (stack.length) {
-      const id = stack.shift()!;
-      out.push(id);
-      stack.unshift(...statement(id).children);
-    }
-    return out;
-  }
-
   return {
     STATEMENTS,
     byId,
     ROOT_IDS: sources.map((r) => r.n),
     statement,
     ancestorsOf,
-    descendantsOf,
   };
 }
 
@@ -90,4 +76,3 @@ export const byId = tree.byId;
 export const ROOT_IDS = tree.ROOT_IDS;
 export const statement = tree.statement;
 export const ancestorsOf = tree.ancestorsOf;
-export const descendantsOf = tree.descendantsOf;

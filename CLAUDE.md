@@ -38,7 +38,7 @@ All application state lives in three places, and this separation matters:
 
 - **The tree** (`src/model/tree.ts`) is fixed, built once at module load by
   walking `src/data/tractatus.ts`. `STATEMENTS`, `byId`, `ROOT_IDS`,
-  `ancestorsOf`, `descendantsOf`.
+  `statement`, `ancestorsOf`.
 - **View state** is a *pin set* plus a *sparse* `expandOverrides` map. Nothing
   else describes what's on screen.
 - **The focused-view derivation** (`src/model/focusedView.ts`) — the heart of
