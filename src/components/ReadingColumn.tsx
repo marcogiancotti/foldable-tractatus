@@ -113,10 +113,34 @@ export default function ReadingColumn({
             Tractatus
           </h1>
           <p className="rc-intro">
-            The book is built as a tree. Seven numbered propositions, each branching into
-            decimal remarks that comment on the one above. Read it folded — open a line to
-            see what supports it, pin a word to trace it through the whole, keep your notes
-            in the margin.
+            Ludwig Wittgenstein wrote most of the <em>Tractatus Logico-Philosophicus</em>{' '}
+            while fighting in World War I. When he was done, he believed this book made
+            philosophy obsolete, so he found a job as an elementary school teacher. While he
+            would later change his mind on its finality, the Tractatus remains one of the most
+            important works of philosophy to this day.
+          </p>
+          <p className="rc-intro">
+            The Tractatus has an unusual shape: it is not a sequence of chapters but a{' '}
+            <strong>tree</strong> of statements and sub-statements and sub-sub-statements. In
+            other words, it is not a linear read but a branching set of rabbit-holes.
+          </p>
+          <p className="rc-intro">
+            This page is an attempt at making that tree maximally traversable and
+            interactive.{' '}
+            <strong>
+              Use the tools available to explore, make cross-sections, annotate, fold and
+              sculpt the book the way you prefer. Save any set of pins as a named thread in
+              the control panel, or bookmark the page in your browser. Export the result as a Markdown or PDF file to keep,
+              or share a special link that reopens your annotated version of the book in someone else's browser.
+            </strong>
+          </p>
+          <p className="rc-intro rc-intro-fine">
+            This is the public-domain C. K. Ogden translation of the Tractatus. For Bertrand
+            Russell's introduction, see{' '}
+            <a href="https://www.gutenberg.org/ebooks/5740" target="_blank" rel="noreferrer">
+              Project Gutenberg
+            </a>
+            .
           </p>
         </div>
         <div className="rc-meta">

@@ -19,6 +19,30 @@
   text-wrap: pretty;
 }
 
+/* The closing source note is apparatus, not intro prose — set it a step down.
+   Two classes so it also wins over the 16px mobile override. */
+.rc-intro.rc-intro-fine {
+  font-size: 15px;
+  color: var(--ink60);
+}
+
+/* The intro sets body weight at 300, so a browser-default bold lands far too
+   heavy; 500 reads as emphasis without shouting. */
+.rc-intro strong {
+  font-weight: 500;
+}
+
+.rc-intro a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.rc-intro a:hover {
+  color: var(--accent);
+}
+
 .rc-meta {
   display: flex;
   flex-wrap: wrap;
