@@ -4,7 +4,8 @@
   highest-frequency actions. Styles in mobile.css.
 */
 
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
+import { useDialog } from '../lib/useDialog';
 
 interface BarProps {
   canUndo: boolean;
@@ -63,11 +64,17 @@ interface SheetProps {
 }
 
 export function MobileSheet({ open, onClose, children }: SheetProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  // The sheet had no focus management at all: Tab walked straight through it
+  // into the page underneath, which is covered by the scrim and unreachable by
+  // pointer. Escape is handled by App's escape(), which closes the sheet.
+  useDialog(cardRef, open);
+
   if (!open) return null;
   return (
     <>
       <div className="mobile-scrim" onClick={onClose} />
-      <div className="mobile-sheet" role="dialog" aria-label="Controls">
+      <div ref={cardRef} className="mobile-sheet" role="dialog" aria-modal="true" aria-label="Controls">
         <div className="mobile-sheet-grip" aria-hidden="true" />
         {children}
       </div>

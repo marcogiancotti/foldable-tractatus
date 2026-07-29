@@ -4,15 +4,20 @@
 
 /* ---- undo / copy toast ---- */
 
+/* The live region stays mounted even with no toast (so announcements are not
+   lost), which would leave an invisible fixed box over the page — hence
+   pointer-events: none here, re-enabled on the card that actually exists. */
 .toast-wrap {
   position: fixed;
   left: 50%;
   bottom: 30px;
   transform: translateX(-50%);
   z-index: 60;
+  pointer-events: none;
 }
 
 .toast-card {
+  pointer-events: auto;
   position: relative;
   overflow: hidden; /* clips the countdown bar to the chip's rounded corners */
   display: flex;
@@ -78,15 +83,18 @@
 
 /* ---- "back to N" return pill (after a cross-ref jump) ---- */
 
+/* always-mounted live region — see .toast-wrap */
 .return-wrap {
   position: fixed;
   left: 50%;
   bottom: 30px;
   transform: translateX(-50%);
   z-index: 60;
+  pointer-events: none;
 }
 
 .return-pill {
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   gap: 6px;

@@ -490,12 +490,19 @@
     calc(var(--indent-base) + var(--depth, 0) * var(--indent-step) + 92px);
 }
 
+/* a real <button>, so the element defaults need resetting to keep the note
+   reading as prose rather than as a control */
 .note-box {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  width: 100%;
+  border: none;
   border-left: 2px solid transparent;
-  padding-left: 9px;
+  padding: 0 0 0 9px;
+  background: none;
+  font: inherit;
+  text-align: left;
   cursor: text;
   transition: border-color 120ms ease;
 }

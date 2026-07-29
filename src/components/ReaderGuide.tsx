@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useDialog } from '../lib/useDialog';
 
 interface ReaderGuideProps {
   open: boolean;
@@ -87,11 +88,13 @@ export default function ReaderGuide({
   onShortcutsChange,
 }: ReaderGuideProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Traps Tab inside the card and hands focus back to the trigger on close.
+  useDialog(cardRef, open, closeRef);
 
   useEffect(() => {
     if (!open) return;
-    closeRef.current?.focus();
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
@@ -104,6 +107,7 @@ export default function ReaderGuide({
   return (
     <div className="guide-scrim" onClick={onClose}>
       <div
+        ref={cardRef}
         className="guide-card"
         role="dialog"
         aria-modal="true"

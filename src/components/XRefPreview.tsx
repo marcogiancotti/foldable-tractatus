@@ -9,7 +9,7 @@
        is NOT written inline in the statement's prose.
 */
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { statement } from '../model/tree';
 import MathText from './MathText';
@@ -27,6 +27,7 @@ const MARGIN = 12;
 export function RefLink({ target, onNavigate, hit = false }: RefLinkProps) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  const popId = useId();
   // The popover is portalled to <body>: it carries block content (paragraphs,
   // even a table in the 5.101 preview), which is illegal inside the prose <p>
   // this link lives in. `anchor` non-null means open; `coords` is the resolved
@@ -64,8 +65,11 @@ export function RefLink({ target, onNavigate, hit = false }: RefLinkProps) {
       if (e.key === 'Escape') setAnchor(null);
     }
     // The popover is fixed-positioned, so close it if the page scrolls out
-    // from under it rather than let it drift.
+    // from under it rather than let it drift — unless the reader is inside it,
+    // which is what happens when they Tab toward "Go to statement N" and the
+    // browser scrolls the focused control into view.
     function onScroll() {
+      if (popRef.current?.contains(document.activeElement)) return;
       setAnchor(null);
     }
     document.addEventListener('pointerdown', onPointerDown);
@@ -93,7 +97,10 @@ export function RefLink({ target, onNavigate, hit = false }: RefLinkProps) {
         ref={btnRef}
         type="button"
         className={`xref-num${open ? ' is-open' : ''}${hit ? ' term-hit' : ''}`}
+        // A disclosure, not a dialog: focus is never moved into the popover, so
+        // claiming role="dialog" promised a modal contract nothing implemented.
         aria-expanded={open}
+        aria-controls={open ? popId : undefined}
         aria-label={`preview statement ${target}`}
         title={`preview ${target}`}
         onClick={(e) => {
@@ -107,8 +114,8 @@ export function RefLink({ target, onNavigate, hit = false }: RefLinkProps) {
         createPortal(
           <div
             ref={popRef}
+            id={popId}
             className="xref-pop xref-pop-fixed"
-            role="dialog"
             aria-label={`Preview of statement ${target}`}
             style={{
               top: coords?.top ?? anchor.bottom + GAP,

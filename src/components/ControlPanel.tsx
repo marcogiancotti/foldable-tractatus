@@ -314,8 +314,10 @@ export default function ControlPanel({
                   type="button"
                   className="cp-export-row"
                   title="export pins & notes"
+                  // A disclosure, not a menu: aria-expanded is the whole
+                  // semantic, and the items below are plain buttons rather than
+                  // menuitems faking a keyboard contract nobody implemented.
                   aria-expanded={exportOpen}
-                  aria-haspopup="menu"
                   onClick={() => setExportOpen((v) => !v)}
                 >
                   <span className="cp-export-icon msym" aria-hidden="true">
@@ -328,11 +330,10 @@ export default function ControlPanel({
                 </button>
 
                 {exportOpen && (
-                  <div className="cp-export-menu" role="menu">
+                  <div className="cp-export-menu" aria-label="Export">
                     <button
                       type="button"
                       className="cp-export-item"
-                      role="menuitem"
                       onClick={() => {
                         onExportMarkdown();
                         setExportOpen(false);
@@ -343,7 +344,6 @@ export default function ControlPanel({
                     <button
                       type="button"
                       className="cp-export-item"
-                      role="menuitem"
                       onClick={() => {
                         onExportPdf();
                         setExportOpen(false);

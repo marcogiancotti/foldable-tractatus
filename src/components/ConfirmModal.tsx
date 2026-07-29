@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useDialog } from '../lib/useDialog';
 
 export interface ConfirmRequest {
   title: string; // e.g. "Replace your current pins?"
@@ -16,11 +17,13 @@ const TITLE_ID = 'confirm-modal-title';
 
 export default function ConfirmModal({ request, onConfirm, onCancel }: ConfirmModalProps) {
   const confirmRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Traps Tab inside the card and hands focus back to the trigger on close.
+  useDialog(cardRef, request !== null, confirmRef);
 
   useEffect(() => {
     if (!request) return;
-    confirmRef.current?.focus();
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel();
     };
@@ -33,6 +36,7 @@ export default function ConfirmModal({ request, onConfirm, onCancel }: ConfirmMo
   return (
     <div className="modal-scrim" onClick={onCancel}>
       <div
+        ref={cardRef}
         className="modal-card"
         role="dialog"
         aria-modal="true"

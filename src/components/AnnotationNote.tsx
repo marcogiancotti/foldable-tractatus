@@ -112,18 +112,13 @@ export default function AnnotationNote({
           </div>
         </div>
       ) : (
-        <div
+        // A real button, not a div[role=button]: the hand-rolled key handler
+        // supported Enter but not Space, which native buttons activate.
+        <button
+          type="button"
           className="note-box"
-          onClick={onStartEdit}
-          role="button"
-          tabIndex={0}
           aria-label={`Edit annotation for statement ${n}`}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              onStartEdit();
-            }
-          }}
+          onClick={onStartEdit}
         >
           {/* Margin notes rest clamped to a few lines and never overlap (§6);
               each wears its statement number, and the "more" hint shows only
@@ -145,7 +140,7 @@ export default function AnnotationNote({
           <span className="note-pencil msym" aria-hidden="true">
             edit
           </span>
-        </div>
+        </button>
       )}
     </div>
   );

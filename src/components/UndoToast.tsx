@@ -17,6 +17,9 @@ const DWELL_PLAIN = 4200;
 
 export default function UndoToast({ toast, onUndo, onDismiss }: UndoToastProps) {
   const [barRun, setBarRun] = useState(false);
+  // Hovering or focusing the toast holds it open (WCAG 2.2.1): the Undo button
+  // lives inside, and 6s is not enough time for everyone to reach it.
+  const [held, setHeld] = useState(false);
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
 
@@ -24,7 +27,7 @@ export default function UndoToast({ toast, onUndo, onDismiss }: UndoToastProps) 
   // animation) whenever a *new* toast is raised — keyed on toast.id, not on
   // object identity, so re-renders with the same toast don't reset the clock.
   useEffect(() => {
-    if (!toast) return;
+    if (!toast || held) return;
     setBarRun(false);
     const dwell = toast.undoable ? DWELL_UNDOABLE : DWELL_PLAIN;
 
@@ -44,36 +47,51 @@ export default function UndoToast({ toast, onUndo, onDismiss }: UndoToastProps) 
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [toast?.id, toast?.undoable]);
+  }, [toast?.id, toast?.undoable, held]);
 
-  if (!toast) return null;
-
-  const dwell = toast.undoable ? DWELL_UNDOABLE : DWELL_PLAIN;
+  const dwell = toast?.undoable ? DWELL_UNDOABLE : DWELL_PLAIN;
 
   const handleUndo = () => {
     onUndo();
     onDismiss();
   };
 
+  /*
+    The live region is ALWAYS mounted, holding its content conditionally.
+    Mounting region and message in the same commit is the classic way to lose an
+    announcement: assistive tech watches existing live regions for mutations, and
+    a region that appears already-populated has nothing to report (4.1.3).
+  */
   return (
-    <div className="toast-wrap" role="status" aria-live="polite">
-      <div className="toast-card">
-        <span className="toast-msg">{toast.message}</span>
-        {toast.undoable && (
-          <button type="button" className="toast-undo" onClick={handleUndo}>
-            Undo
-          </button>
-        )}
-        {toast.undoable && (
-          <span
-            className="toast-bar"
-            style={{
-              transform: barRun ? 'scaleX(0)' : 'scaleX(1)',
-              transition: barRun ? `transform ${dwell}ms linear` : 'none',
-            }}
-          />
-        )}
-      </div>
+    <div
+      className="toast-wrap"
+      role="status"
+      aria-live="polite"
+      onMouseEnter={() => setHeld(true)}
+      onMouseLeave={() => setHeld(false)}
+      onFocusCapture={() => setHeld(true)}
+      onBlurCapture={() => setHeld(false)}
+    >
+      {toast && (
+        <div className="toast-card">
+          <span className="toast-msg">{toast.message}</span>
+          {toast.undoable && (
+            <button type="button" className="toast-undo" onClick={handleUndo}>
+              Undo
+            </button>
+          )}
+          {toast.undoable && (
+            <span
+              className="toast-bar"
+              style={{
+                // paused while held, so the bar never claims time it isn't taking
+                transform: barRun && !held ? 'scaleX(0)' : 'scaleX(1)',
+                transition: barRun && !held ? `transform ${dwell}ms linear` : 'none',
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

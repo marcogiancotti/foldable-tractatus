@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import type { ThreadInfo } from './ControlPanel';
 
 interface ThreadsMenuProps {
@@ -82,20 +81,22 @@ export default function ThreadsMenu({
     }
   }
 
-  function rowKeyDown(e: ReactKeyboardEvent, run: () => void) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      run();
-    }
-  }
+  /*
+    This was role="menu" with role="menuitem" divs — invalid twice over: a
+    menuitem must not contain independently focusable descendants (the thread
+    rows each hold three action buttons), and none of the APG menu keyboard
+    contract (arrow navigation, roving tabindex, typeahead) was implemented.
 
+    It is a disclosure, not a menu, so it is now built from real buttons in a
+    labelled group. aria-expanded on the trigger is the whole semantic, Enter and
+    Space come free with <button>, and nothing has to fake keyboard support.
+  */
   return (
     <div className="cp-threads-group" ref={rootRef}>
       <button
         type="button"
         className="cp-threads-trigger"
         aria-expanded={open}
-        aria-haspopup="menu"
         aria-label="Saved threads"
         title="saved threads"
         onClick={() => onOpenChange(!open)}
@@ -110,28 +111,21 @@ export default function ThreadsMenu({
       </button>
 
       {open && (
-        <div className="cp-threads-menu" role="menu">
+        <div className="cp-threads-menu" aria-label="Saved threads">
           <div className="cp-menu-sec">Presets</div>
           {presets.map((p) => (
-            <div
+            <button
               key={p.id}
+              type="button"
               className="cp-menu-row"
-              role="menuitem"
-              tabIndex={0}
               onClick={() => {
                 onApplyPreset(p.id);
                 onOpenChange(false);
               }}
-              onKeyDown={(e) =>
-                rowKeyDown(e, () => {
-                  onApplyPreset(p.id);
-                  onOpenChange(false);
-                })
-              }
             >
               <span className="cp-menu-name">{p.name}</span>
               <span className="cp-menu-count">{p.pins.length} pins</span>
-            </div>
+            </button>
           ))}
 
           <div className="cp-menu-sec">
@@ -161,24 +155,21 @@ export default function ThreadsMenu({
                 />
               </div>
             ) : (
-              <div
-                key={t.id}
-                className="cp-menu-row cp-menu-row-thread"
-                role="menuitem"
-                tabIndex={0}
-                onClick={() => {
-                  onApplyThread(t.id);
-                  onOpenChange(false);
-                }}
-                onKeyDown={(e) =>
-                  rowKeyDown(e, () => {
+              // A button cannot nest buttons, so the row splits: the apply
+              // action is its own button, the three per-thread actions sit
+              // beside it rather than inside it.
+              <div key={t.id} className="cp-menu-row cp-menu-row-thread">
+                <button
+                  type="button"
+                  className="cp-menu-main"
+                  onClick={() => {
                     onApplyThread(t.id);
                     onOpenChange(false);
-                  })
-                }
-              >
-                <span className="cp-menu-name">{t.name}</span>
-                <span className="cp-menu-count">{t.pins.length} pins</span>
+                  }}
+                >
+                  <span className="cp-menu-name">{t.name}</span>
+                  <span className="cp-menu-count">{t.pins.length} pins</span>
+                </button>
                 <span className="cp-menu-actions">
                   <button
                     type="button"
@@ -250,26 +241,18 @@ export default function ThreadsMenu({
               />
             </div>
           ) : (
-            <div
+            <button
+              type="button"
               className={`cp-save-row${saveDisabled ? ' is-disabled' : ''}`}
-              role="menuitem"
-              tabIndex={saveDisabled ? -1 : 0}
-              aria-disabled={saveDisabled || undefined}
-              onClick={() => {
-                if (!saveDisabled) setSavingOpen(true);
-              }}
-              onKeyDown={(e) =>
-                rowKeyDown(e, () => {
-                  if (!saveDisabled) setSavingOpen(true);
-                })
-              }
+              disabled={saveDisabled}
+              onClick={() => setSavingOpen(true)}
             >
               <span className="cp-save-icon msym" aria-hidden="true">
                 add
               </span>
               <span className="cp-save-label">Save current pins…</span>
               <span className="cp-slots">{slotsLeft} left</span>
-            </div>
+            </button>
           )}
 
           <div className="cp-menu-hint">
