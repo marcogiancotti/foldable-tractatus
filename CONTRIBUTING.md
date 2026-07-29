@@ -18,8 +18,16 @@ compatibility, test coverage for the pure logic in `src/model/`, and corrections
 to the text or the curated term index.
 
 Likely to be declined: new dependencies (the app deliberately ships React,
-KaTeX, and nothing else), analytics or tracking of any kind, anything that puts
-a reader's annotations into a URL, and features that add server-side state.
+KaTeX, and nothing else), anything that puts a reader's annotations into a URL,
+and features that add server-side state.
+
+Measurement is a special case. The app supports optional, self-hosted,
+cookieless Plausible analytics — off unless a deployment configures it — under
+two hard rules: nothing a reader wrote ever leaves the browser, and every
+property sent is a bounded label from a published vocabulary. Additions that
+respect both are welcome; a third-party tracker, a cookie, a visitor id, or
+anything that forwards reader text is not. See
+[`docs/analytics.md`](docs/analytics.md).
 
 ## Setup
 

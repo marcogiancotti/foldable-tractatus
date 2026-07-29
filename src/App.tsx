@@ -9,6 +9,8 @@ import UndoToast from './components/UndoToast';
 import { READING_PATHS, pathById } from './data/paths';
 import PrintView from './components/PrintView';
 import ReaderGuide from './components/ReaderGuide';
+import { track, trackOnce } from './lib/analytics';
+import { useAnalytics } from './lib/useAnalytics';
 import { copyText } from './lib/clipboard';
 import {
   fetchBundle,
@@ -156,6 +158,7 @@ function AppInner() {
       const id = await uploadBundle(bundle);
       const link = `${location.origin}${location.pathname}?bundle=${encodeURIComponent(id)}#k=${key}`;
       const ok = await copyText(link);
+      track('Shared', { kind: 'notes-link' });
       dispatch({
         type: 'toast',
         message: ok
@@ -193,12 +196,17 @@ function AppInner() {
   );
   const exportMarkdown = () => {
     downloadMarkdown(toMarkdown(printEntries, state.pins.size, noteCount));
+    track('Exported', { kind: 'markdown' });
     dispatch({ type: 'toast', message: 'Markdown export downloaded' });
   };
-  const exportPdf = () => window.print();
+  const exportPdf = () => {
+    track('Exported', { kind: 'pdf' });
+    window.print();
+  };
 
   const shareView = async () => {
     const ok = await copyText(location.href);
+    track('Shared', { kind: 'view' });
     dispatch({
       type: 'toast',
       message: ok ? 'Link to this view copied to clipboard' : "Couldn't copy the link",
@@ -209,25 +217,43 @@ function AppInner() {
   const shareStatement = async (n: string) => {
     const link = `${location.origin}${location.pathname}?statement=${encodeURIComponent(n)}`;
     const ok = await copyText(link);
+    track('Shared', { kind: 'statement' });
     dispatch({
       type: 'toast',
       message: ok ? `Link to statement ${n} copied` : "Couldn't copy the link",
     });
   };
 
+  // A reader opening the guide is a signal in itself: the affordances did not
+  // explain themselves. Counted from both routes (button and `?`).
+  const openGuide = () => {
+    track('Opened guide');
+    setHelpOpen(true);
+  };
+
+  // Every handler below is reachable only from the keyboard, so one wrapper
+  // answers "do readers find the shortcuts?" without a call per key. Escape is
+  // left out: it stays live with shortcuts off and often just blurs.
+  const kb =
+    <A extends unknown[]>(fn: (...args: A) => void) =>
+    (...args: A) => {
+      trackOnce('shortcuts', 'Used keyboard');
+      fn(...args);
+    };
+
   useKeyboardNav({
-    toggleRow: (n, expand) => dispatch({ type: 'toggleRow', n, expand }),
-    expandSubtree: (n) => dispatch({ type: 'expandSubtree', n }),
-    promotePeeks: (members) => dispatch({ type: 'promotePeeks', members }),
-    togglePin: (n) => dispatch({ type: 'togglePin', n }),
-    shareStatement,
-    editNote: (n) => setEditingNote(n),
-    focusSearch: () => {
+    toggleRow: kb((n, expand) => dispatch({ type: 'toggleRow', n, expand })),
+    expandSubtree: kb((n) => dispatch({ type: 'expandSubtree', n })),
+    promotePeeks: kb((members) => dispatch({ type: 'promotePeeks', members })),
+    togglePin: kb((n) => dispatch({ type: 'togglePin', n })),
+    shareStatement: kb(shareStatement),
+    editNote: kb((n) => setEditingNote(n)),
+    focusSearch: kb(() => {
       setPanelOpen(true);
       if (mobile) setSheetOpen(true); // the panel only renders inside the sheet
       setSearchFocusPending(true);
-    },
-    openHelp: () => setHelpOpen(true),
+    }),
+    openHelp: kb(openGuide),
     escape: () => {
       if (helpOpen) setHelpOpen(false);
       else if (sheetOpen) setSheetOpen(false);
@@ -271,7 +297,10 @@ function AppInner() {
     return () => window.removeEventListener('resize', measure);
   }, []);
 
-  const applyPinSet = (pins: string[], name: string, pathId?: string) =>
+  const applyPinSet = (pins: string[], name: string, pathId?: string) => {
+    // Curated path ids are a published, bounded vocabulary and safe to name;
+    // a saved thread's name is the reader's own words, so it never travels.
+    track('Applied pin set', { set: pathId ?? 'saved-thread' });
     dispatch({
       type: 'applyPins',
       pins,
@@ -279,6 +308,7 @@ function AppInner() {
       pathId,
       message: `Pins replaced — "${name}" (${pins.length} pin${pins.length === 1 ? '' : 's'})`,
     });
+  };
 
   // Applying a path/thread replaces the pins, so existing pins get a confirm
   // first (spec §11); with nothing to overwrite it applies immediately.
@@ -296,6 +326,9 @@ function AppInner() {
     dispatch({ type: 'setTerm', term: value.trim() ? value : null });
 
   const matchCount = termStats?.matches.length ?? 0;
+
+  // Optional, off unless the build is configured for it (src/lib/analytics.ts).
+  useAnalytics({ pinCount: state.pins.size, noteCount, display, activeTerm: term });
 
   const confirmRequest = ((): ConfirmRequest | null => {
     if (!pendingConfirm) return null;
@@ -411,7 +444,7 @@ function AppInner() {
       onUndo={() => dispatch({ type: 'undo' })}
       onRedo={() => dispatch({ type: 'redo' })}
       onUnpinAll={() => setPendingConfirm({ kind: 'unpinAll' })}
-      onHelp={() => setHelpOpen(true)}
+      onHelp={openGuide}
       onShare={shareView}
       onExportMarkdown={exportMarkdown}
       onExportPdf={exportPdf}
@@ -428,6 +461,8 @@ function AppInner() {
       }}
       onSaveThread={(name) => {
         threadsApi.save(name, [...state.pins]);
+        // The name is the reader's own words — only the fact is reported.
+        track('Saved thread');
         dispatch({
           type: 'toast',
           message: `Thread "${name}" saved — Share (under More) copies a link to this view`,

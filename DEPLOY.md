@@ -58,6 +58,54 @@ runtime means writing a small adapter, not touching the logic.
 > The author's own deployment lives at `https://tractatus-notes.val.run`. It is
 > not a shared service: run your own val rather than pointing a fork at it.
 
+## 3. Analytics → self-hosted Plausible (optional)
+
+Also **build-time** and also entirely optional: set both variables or neither.
+With either one missing, no script is loaded and no request is made.
+
+```
+VITE_PLAUSIBLE_DOMAIN=<the site name as registered in your Plausible instance>
+VITE_PLAUSIBLE_SRC=https://<your-plausible-host>/js/script.js
+```
+
+Add the site in your Plausible instance first, then register the custom events
+from [`docs/analytics.md`](docs/analytics.md) as goals — unregistered events are
+accepted but not shown. That document is also where the event catalogue and the
+privacy rules live; read it before adding an event.
+
+Only the standard `script.js` is required. Any CE variant works if you want
+extras (`script.outbound-links.js`, etc.) — the custom events in this app are
+sent through `window.plausible()` and need no particular variant.
+
+> **First-party proxy (recommended).** Content blockers block requests to hosts
+> whose path looks like `/js/script.js` from a known analytics domain, so a
+> meaningful slice of readers is invisible. Serving the script and the event
+> endpoint from your own origin avoids most of that. On Vercel, add a
+> `vercel.json` rewriting a neutral path to your Plausible host and point
+> `VITE_PLAUSIBLE_SRC` at the rewritten path:
+>
+> ```json
+> {
+>   "rewrites": [
+>     { "source": "/stats/js/script.js", "destination": "https://<your-plausible-host>/js/script.js" },
+>     { "source": "/stats/api/event", "destination": "https://<your-plausible-host>/api/event" }
+>   ]
+> }
+> ```
+>
+> Both paths must be proxied: the script is useless without an endpoint to post
+> to. Because the endpoint here is not at the location the script would assume,
+> name it explicitly with the third, optional variable:
+>
+> ```
+> VITE_PLAUSIBLE_SRC=/stats/js/script.js
+> VITE_PLAUSIBLE_API=/stats/api/event
+> ```
+>
+> `VITE_PLAUSIBLE_API` sets the script's `data-api` attribute and is needed only
+> in this proxied case. Verify with the browser's network tab: loading the page
+> should POST to your own origin and get a `202`.
+
 ## Local development
 
 ```sh

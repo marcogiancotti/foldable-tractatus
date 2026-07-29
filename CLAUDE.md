@@ -95,6 +95,18 @@ link" feature.
 
 Sync is gated on `VITE_SYNC_ENDPOINT`; unset, the sync UI simply doesn't appear.
 
+### Analytics — optional, off by default
+
+`src/lib/analytics.ts` (transport + label derivation) and
+`src/lib/useAnalytics.ts` (state-derived milestones) inject a self-hosted
+Plausible script **only** when both `VITE_PLAUSIBLE_DOMAIN` and
+`VITE_PLAUSIBLE_SRC` are set at build time. Two invariants are load-bearing and
+tested: nothing reader-authored is ever sent (annotations aren't read; free
+search collapses to `(free search)`; thread names never travel), and every
+property is a bounded label (counts/depths become milestones). Milestones fire
+at most once per page load. Event catalogue and rationale:
+[`docs/analytics.md`](docs/analytics.md).
+
 ## Data status
 
 The statement tree ships the complete **526-statement Ogden text**,

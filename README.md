@@ -84,7 +84,17 @@ The app is client-side. Notes live in your browser's `localStorage` and are
 never placed in a share link. The optional sync feature encrypts a bundle in
 the browser (AES-GCM-256) before upload and keeps the decryption key in the URL
 *fragment*, which browsers never send to a server — so the host stores
-ciphertext it cannot read. Nothing is tracked or analysed.
+ciphertext it cannot read.
+
+A deployment may optionally enable self-hosted, cookieless
+[Plausible](https://plausible.io) analytics. There is no visitor identifier, no
+cross-site tracking, and nothing you write ever leaves your browser: notes are
+not read by it at all, and free-text search is counted as `(free search)` rather
+than as what you typed. What it does count is aggregate — did anyone pin
+anything, did anyone open the guide — and the full list is
+[`docs/analytics.md`](docs/analytics.md). Do-Not-Track and Global Privacy
+Control are honoured, so the script is not loaded for readers who send either.
+The build here ships with it **off**; it requires explicit configuration.
 
 ## License
 
