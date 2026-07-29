@@ -16,6 +16,17 @@ vi.mock('./model/tree', async (importActual) => {
   return { ...actual, ...actual.buildTree(SAMPLE_TREE) };
 });
 
+// The real reading paths (src/data/paths.ts) pin statements that exist only in
+// the full text, so the preset assertions below run against fixture-scale paths.
+vi.mock('./data/paths', async (importActual) => {
+  const actual = await importActual<typeof import('./data/paths')>();
+  const READING_PATHS: typeof actual.READING_PATHS = [
+    { id: 'picture-theory', name: 'Picture theory', pins: ['2.1', '2.11', '2.12'] },
+    { id: 'world-and-facts', name: 'World & facts', pins: ['1.1', '1.11', '2'] },
+  ];
+  return { ...actual, READING_PATHS, pathById: new Map(READING_PATHS.map((p) => [p.id, p])) };
+});
+
 beforeAll(() => {
   // jsdom lacks matchMedia/scrollTo; the app only needs their shape.
   window.matchMedia ??= ((query: string) => ({

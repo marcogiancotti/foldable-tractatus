@@ -3,7 +3,7 @@
     ?p=1.11,2.12    pinned ids
     &e=2:1,1.2:0    expand overrides (id:1 expand, id:0 collapse)
     &t=picture      active term
-    &path=the-ladder  active reading path
+    &path=saying-showing  active reading path
   Deep link: ?statement=N isolates N (spec §12). Annotations are NEVER here.
 */
 
