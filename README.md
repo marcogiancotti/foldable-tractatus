@@ -48,6 +48,14 @@ npm test         # vitest: derivation, matching, URL codec, crypto, backend
 npm run build    # typecheck + production build
 ```
 
+Requires the Node version in `.nvmrc`. There is no separate lint step —
+type-checking is `tsc --noEmit`, run as part of `npm run build`.
+
+Everything above works with no configuration. The only environment variable,
+`VITE_SYNC_ENDPOINT`, is optional and enables the encrypted-sync feature
+against a backend you deploy yourself; copy `.env.example` to `.env` to set it.
+Left unset, the sync UI is absent and nothing else changes.
+
 ## Layout
 
 - `src/model/` — pure logic: the focused-view derivation (the heart of the
@@ -59,6 +67,29 @@ npm run build    # typecheck + production build
   locally against in-memory libsql).
 - `docs/` — the functional spec.
 
-Deployment (Vercel + Val Town free plan): see [`DEPLOY.md`](DEPLOY.md).
+Deployment (any static host, plus optionally a Val Town val): see
+[`DEPLOY.md`](DEPLOY.md).
 
-The Ogden translation is in the public domain.
+## Contributing
+
+Issues and pull requests are welcome — please read
+[`CONTRIBUTING.md`](CONTRIBUTING.md) first. It covers the branching and PR
+rules, and the handful of non-obvious invariants (the statement data is
+generated, the focused view is derived, share links are a published format)
+that are easy to break by accident.
+
+## Privacy
+
+The app is client-side. Notes live in your browser's `localStorage` and are
+never placed in a share link. The optional sync feature encrypts a bundle in
+the browser (AES-GCM-256) before upload and keeps the decryption key in the URL
+*fragment*, which browsers never send to a server — so the host stores
+ciphertext it cannot read. Nothing is tracked or analysed.
+
+## License
+
+Code: [MIT](LICENSE) © Marco Giancotti.
+
+The C. K. Ogden (1922) English translation of the *Tractatus* is in the public
+domain. The curated term index, the reading paths, and the spec in `docs/` are
+original work under the same MIT license.

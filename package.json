@@ -2,6 +2,8 @@
   "name": "foldable-tractatus",
   "private": true,
   "version": "0.1.0",
+  "description": "An interactive reader for Wittgenstein's Tractatus Logico-Philosophicus that treats the decimal numbering as the tree it is.",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

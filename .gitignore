@@ -6,6 +6,7 @@ coverage/
 # Environment & local config
 .env
 .env.*
+!.env.example
 *.local
 
 # Design exports (kept locally, never committed)
@@ -14,3 +15,6 @@ docs/*.zip
 # OS / editor noise
 .DS_Store
 Thumbs.db
+
+# Local agent tooling lockfile (points at a private skills repo)
+skills-lock.json
