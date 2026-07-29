@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="The Foldable Tractatus">
+  <!--
+    The "fold all" mark: the control panel's unfold_less chevrons, doubled to
+    four, folding in from every cardinal direction onto a point. Paper tile and
+    ink strokes from the design tokens; the dark variant follows the app theme.
+  -->
+  <style>
+    .tile { fill: #fbfaf7; }
+    .mark { stroke: #211f1b; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #181613; }
+      .mark { stroke: #e9e6df; }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="6" />
+  <g class="mark" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5.5 L16 10.5 L21 5.5" />
+    <path d="M11 26.5 L16 21.5 L21 26.5" />
+    <path d="M5.5 11 L10.5 16 L5.5 21" />
+    <path d="M26.5 11 L21.5 16 L26.5 21" />
+  </g>
+</svg>
