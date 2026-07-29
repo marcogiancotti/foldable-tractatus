@@ -16,12 +16,20 @@ interface BarProps {
 }
 
 export function MobileBar({ canUndo, onSearch, onFoldAll, onUnfoldAll, onUndo, onMenu }: BarProps) {
+  // caption = the visible word; label = the accessible name. Keep the caption a
+  // prefix of the label so voice control ("tap Fold") still matches (WCAG 2.5.3).
   const buttons = [
-    { id: 'search', icon: 'search', label: 'search the text', onClick: onSearch },
-    { id: 'foldall', icon: 'unfold_less', label: 'fold all', onClick: onFoldAll },
-    { id: 'unfoldall', icon: 'unfold_more', label: 'unfold all', onClick: onUnfoldAll },
-    { id: 'undo', icon: 'undo', label: 'undo', onClick: onUndo, disabled: !canUndo },
-    { id: 'menu', icon: 'tune', label: 'controls', onClick: onMenu },
+    { id: 'search', icon: 'search', caption: 'Search', label: 'Search the text', onClick: onSearch },
+    { id: 'foldall', icon: 'unfold_less', caption: 'Fold', label: 'Fold all', onClick: onFoldAll },
+    {
+      id: 'unfoldall',
+      icon: 'unfold_more',
+      caption: 'Unfold',
+      label: 'Unfold all',
+      onClick: onUnfoldAll,
+    },
+    { id: 'undo', icon: 'undo', caption: 'Undo', label: 'Undo', onClick: onUndo, disabled: !canUndo },
+    { id: 'menu', icon: 'tune', caption: 'More', label: 'More controls', onClick: onMenu },
   ];
   return (
     <nav className="mobile-bar" aria-label="Controls">
@@ -38,6 +46,9 @@ export function MobileBar({ canUndo, onSearch, onFoldAll, onUnfoldAll, onUndo, o
         >
           <span className="msym" aria-hidden="true">
             {b.icon}
+          </span>
+          <span className="mobile-bar-label" aria-hidden="true">
+            {b.caption}
           </span>
         </button>
       ))}

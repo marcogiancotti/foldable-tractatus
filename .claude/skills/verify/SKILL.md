@@ -39,4 +39,5 @@ Playwright is NOT a project dependency. Install it in the session scratchpad
 - term: tap `.idx-term` or search input → TermCard (mobile: `.mobile-term-dock`)
 - note: `.row-note-btn` → type → Enter → note persists under row
 - cross-ref: `.xref-num` tap → `.xref-pop` → "Go to statement"
-- mobile bar buttons by aria-label: "search the text", "controls", "undo"
+- mobile bar buttons by aria-label: "Search the text", "More controls", "Undo"
+  (the visible caption under each icon is a prefix of the aria-label)

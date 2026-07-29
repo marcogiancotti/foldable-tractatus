@@ -140,21 +140,27 @@
     z-index: 45; /* below modal 50 / guide 55 / toast 60 */
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    padding: 4px 8px calc(4px + env(safe-area-inset-bottom));
+    justify-content: space-between;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom));
     background: var(--paper);
     border-top: 1px solid var(--hairline);
   }
 
+  /* icon over caption: a bare glyph means nothing without a keyboard to hover
+     with. The buttons share the width evenly so the captions get equal room. */
   .mobile-bar-btn {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 44px;
+    gap: 3px;
+    flex: 1 1 0;
+    min-width: 0;
+    height: auto;
+    min-height: 48px; /* stays above the 44px touch minimum */
     border: none;
     background: none;
-    padding: 0;
+    padding: 5px 2px;
     border-radius: var(--radius);
     color: var(--ink60);
     cursor: pointer;
@@ -164,12 +170,20 @@
     background: var(--tap-surface);
   }
 
+  /* colour is inherited, so this greys the glyph and its caption together */
   .mobile-bar-btn.is-disabled {
     color: var(--ink24);
   }
 
   .mobile-bar-btn .msym {
-    font-size: 22px;
+    font-size: 21px;
+  }
+
+  .mobile-bar-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    user-select: none;
   }
 
   /* ---- bottom sheet (the control panel's mobile home) ---- */
@@ -217,13 +231,57 @@
     width: 100%;
   }
 
+  /* The six tools become labelled tiles. .cp-tool-chip already carries the right
+     text — on desktop it's a tooltip floating above on :hover, which touch can
+     never trigger — so it's re-laid-out in flow as the tile's caption rather than
+     adding a second label element. */
+  .mobile-sheet .cp-toolbar {
+    column-gap: 4px;
+    row-gap: 6px;
+    margin-top: 14px;
+  }
+
+  .mobile-sheet .cp-tool {
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    height: auto;
+    padding: 9px 2px;
+  }
+
+  /* no hover on touch, so the resting state has to be the readable one */
+  .mobile-sheet .cp-tool-icon.msym {
+    font-size: 22px;
+    color: var(--ink60);
+  }
+
+  .mobile-sheet .cp-tool-chip {
+    position: static;
+    transform: none;
+    margin: 0;
+    padding: 0;
+    opacity: 1;
+    background: none;
+    color: var(--ink60);
+    font-size: 10px;
+  }
+
+  .mobile-sheet .cp-tool:active {
+    background: var(--tap-surface);
+  }
+
+  .mobile-sheet .cp-tool.is-disabled .cp-tool-icon.msym,
+  .mobile-sheet .cp-tool.is-disabled .cp-tool-chip {
+    color: var(--ink24);
+  }
+
   /* ---- selected-term card, docked above the bar ---- */
 
   .mobile-term-dock {
     position: fixed;
     left: 10px;
     right: 10px;
-    bottom: calc(58px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom)); /* clears the captioned bar */
     z-index: 44;
   }
 
