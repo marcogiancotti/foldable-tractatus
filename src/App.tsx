@@ -22,6 +22,7 @@ import { decryptBundle, encryptBundle, generateKey } from './lib/sync/crypto';
 import { downloadMarkdown, exportSelection, toMarkdown } from './lib/export';
 import { useKeyboardNav } from './lib/useKeyboardNav';
 import { useMediaQuery } from './lib/useMediaQuery';
+import { useShortcuts } from './lib/useShortcuts';
 import { deriveDisplay } from './model/focusedView';
 import { encodeViewState, statementParam } from './model/urlState';
 import { matchingStatements, ownCount } from './model/match';
@@ -49,6 +50,7 @@ function AppInner() {
   const { state, dispatch } = useStore();
   const threadsApi = useThreads();
   const [theme, toggleTheme] = useTheme();
+  const [shortcutsOn, setShortcutsOn] = useShortcuts();
   const searchRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(true);
   // `/` must work with the panel collapsed: open it first, focus after render.
@@ -218,6 +220,7 @@ function AppInner() {
     expandSubtree: (n) => dispatch({ type: 'expandSubtree', n }),
     promotePeeks: (members) => dispatch({ type: 'promotePeeks', members }),
     togglePin: (n) => dispatch({ type: 'togglePin', n }),
+    shareStatement,
     editNote: (n) => setEditingNote(n),
     focusSearch: () => {
       setPanelOpen(true);
@@ -233,6 +236,7 @@ function AppInner() {
     },
     undo: () => dispatch({ type: 'undo' }),
     redo: () => dispatch({ type: 'redo' }),
+    enabled: shortcutsOn,
   });
 
   const display = useMemo(
@@ -490,14 +494,18 @@ function AppInner() {
     // .app-root wholesale, and display:none on an ancestor is not undoable
     // from a descendant, so .print-view must be a sibling to print at all.
     <>
+    {/* first focusable thing on the page — the reading tree is one Tab away */}
+    <a className="skip-link" href="#statements">
+      Skip to the statements
+    </a>
     <div className="app-root" ref={rootRef}>
       {!mobile && (
-        <div className="panel-col">
+        <aside className="panel-col" aria-label="Controls">
           <div className="panel-sticky" style={{ marginTop: panelTop }}>
             {panel}
             {termCard}
           </div>
-        </div>
+        </aside>
       )}
       <ReadingColumn
         display={display}
@@ -553,7 +561,12 @@ function AppInner() {
       onReturn={() => returnTo && returnToStatement(returnTo)}
       onDismiss={() => setReturnTo(null)}
     />
-    <ReaderGuide open={helpOpen} onClose={() => setHelpOpen(false)} />
+    <ReaderGuide
+      open={helpOpen}
+      onClose={() => setHelpOpen(false)}
+      shortcutsOn={shortcutsOn}
+      onShortcutsChange={setShortcutsOn}
+    />
     <PrintView entries={printEntries} pinCount={state.pins.size} noteCount={noteCount} />
     <ConfirmModal
       request={confirmRequest}

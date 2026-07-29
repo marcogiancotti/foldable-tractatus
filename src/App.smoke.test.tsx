@@ -67,6 +67,16 @@ const click = (el: Element | null) => {
   );
 };
 
+// Same prototype-setter dance as `type` below, for controlled checkboxes.
+const check = (box: Element | null, next: boolean) => {
+  expect(box).not.toBeNull();
+  return act(async () => {
+    const proto = Object.getPrototypeOf(box);
+    Object.getOwnPropertyDescriptor(proto, 'checked')!.set!.call(box, next);
+    box!.dispatchEvent(new Event('click', { bubbles: true }));
+  });
+};
+
 // React 19 reads controlled-input changes off native `input` events; setting
 // .value must go through the prototype setter or React swallows the change.
 const type = (input: Element | null, value: string) => {
@@ -317,5 +327,135 @@ describe('app smoke', () => {
     await type(container.querySelector('.note-input'), 'x'.repeat(1100));
     await press(container.querySelector('.note-input'), 'Enter');
     expect(container.querySelector('.note-text')?.textContent).toHaveLength(1000);
+  });
+});
+
+/*
+  Accessibility contracts. These guard the three structural properties that are
+  invisible to the other suites: the tree exposes its shape, it costs exactly one
+  Tab, and the single-key shortcuts stay inside it (WCAG 2.1.4 / 2.4.7 / 4.1.2).
+*/
+describe('accessibility', () => {
+  const rows = () => [...container.querySelectorAll<HTMLElement>('[role="treeitem"]')];
+  const focusRow = (n: string) =>
+    act(async () => container.querySelector<HTMLElement>(`[data-n="${n}"]`)!.focus());
+
+  it('exposes the statements as a tree with level and position on every node', () => {
+    const tree = container.querySelector('[role="tree"]');
+    expect(tree).not.toBeNull();
+    expect(tree!.getAttribute('aria-label')).toBe('Statements');
+
+    const items = rows();
+    expect(items).toHaveLength(7);
+    items.forEach((el, i) => {
+      expect(el.getAttribute('aria-level')).toBe('1');
+      expect(el.getAttribute('aria-posinset')).toBe(String(i + 1));
+      expect(el.getAttribute('aria-setsize')).toBe('7');
+    });
+  });
+
+  it('names each node with its number and prose, not raw LaTeX', () => {
+    // statement 6 is the one carrying $[\bar p, \bar \xi, N(\bar \xi)]$
+    const label = container.querySelector('[data-n="6"]')!.getAttribute('aria-label')!;
+    expect(label).toMatch(/^6\. The general form of truth-function is/);
+    expect(label).not.toContain('\\bar');
+    expect(label).not.toContain('$');
+  });
+
+  it('reports fold state and pin state on the node itself', async () => {
+    const one = () => container.querySelector('[data-n="1"]')!;
+    expect(one().getAttribute('aria-expanded')).toBe('false');
+    expect(one().getAttribute('aria-selected')).toBe('false');
+
+    await click(container.querySelector('[data-n="1"] .row-toggle'));
+    expect(one().getAttribute('aria-expanded')).toBe('true');
+
+    await click(container.querySelector('[data-n="1"] .row-pin'));
+    expect(one().getAttribute('aria-selected')).toBe('true');
+
+    // statement 4 is a leaf in the fixture — a leaf must not claim expandability
+    expect(container.querySelector('[data-n="4"]')!.hasAttribute('aria-expanded')).toBe(false);
+  });
+
+  it('costs exactly one tab stop, wherever focus has been', async () => {
+    const tabbable = () =>
+      [...container.querySelectorAll('[role="tree"] [tabindex="0"]')].map(
+        (el) => (el as HTMLElement).dataset.n,
+      );
+    expect(tabbable()).toEqual(['1']);
+
+    // the roving target follows focus …
+    await focusRow('3');
+    expect(tabbable()).toEqual(['3']);
+
+    // … and falls back to the first node when its row folds away
+    await click(container.querySelector('[data-n="1"] .row-toggle'));
+    await focusRow('1.1');
+    expect(tabbable()).toEqual(['1.1']);
+    await click(container.querySelector('[aria-label="fold all"]'));
+    expect(tabbable()).toEqual(['1']);
+  });
+
+  it('keeps the per-row controls out of the tab order', () => {
+    for (const sel of ['.row-toggle', '.row-pin', '.row-share-btn', '.row-note-btn']) {
+      const el = container.querySelector(`[data-n="1"] ${sel}`);
+      if (el) expect(el.getAttribute('tabindex')).toBe('-1');
+    }
+    expect(container.querySelector('.idx-term')?.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('fires single-key shortcuts only when focus is inside the tree', async () => {
+    // p on the body must not pin — this is what makes speech input usable
+    await press(document.body, 'p');
+    expect(location.search).toBe('');
+
+    await focusRow('2');
+    await press(container.querySelector('[data-n="2"]'), 'p');
+    expect(decodeURIComponent(location.search)).toBe('?p=2');
+  });
+
+  it('leaves arrow keys to the page unless the tree has focus', async () => {
+    await press(document.body, 'ArrowDown');
+    expect(document.activeElement).not.toBe(container.querySelector('[data-n="1"]'));
+
+    await focusRow('1');
+    await press(container.querySelector('[data-n="1"]'), 'ArrowDown');
+    expect(document.activeElement).toBe(container.querySelector('[data-n="2"]'));
+  });
+
+  it('honours the single-key shortcut kill switch', async () => {
+    await press(document.body, '?');
+    expect(document.body.textContent).toContain('Reader guide');
+
+    const box = () => document.querySelector<HTMLInputElement>('.guide-toggle-box');
+    expect(box()!.checked).toBe(true);
+    await check(box(), false);
+    expect(box()!.checked).toBe(false);
+    await press(document.body, 'Escape');
+
+    // with shortcuts off, neither the global nor the tree keys fire …
+    await press(document.body, '?');
+    expect(document.body.textContent).not.toContain('Reader guide');
+    await focusRow('2');
+    await press(container.querySelector('[data-n="2"]'), 'p');
+    expect(location.search).toBe('');
+
+    // … but Ctrl/⌘ history and Escape are never single-key, so they survive
+    await click(container.querySelector('[data-n="2"] .row-pin'));
+    expect(decodeURIComponent(location.search)).toBe('?p=2');
+    await act(async () =>
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true, cancelable: true }),
+      ),
+    );
+    expect(location.search).toBe('');
+
+    // The setting lives in a module-level cache (useShortcuts), which outlives
+    // the per-test remount — hand it back on, or every later test runs with
+    // shortcuts off. Clicking the panel tool works with them disabled.
+    await click(container.querySelector('[aria-label="shortcuts"]'));
+    await check(box(), true);
+    expect(box()!.checked).toBe(true);
+    await press(document.body, 'Escape');
   });
 });

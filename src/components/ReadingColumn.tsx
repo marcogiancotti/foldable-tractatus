@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, type Ref } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react';
 import type { DisplayItem } from '../model/focusedView';
 import { computeNoteTops } from '../lib/noteLayout';
+import { annotateTree, itemKey } from '../model/ariaTree';
 import { ROOT_IDS, STATEMENTS } from '../model/tree';
 import PeekRange from './PeekRange';
 import StatementRow from './StatementRow';
@@ -50,6 +51,24 @@ export default function ReadingColumn({
   const annotationCount = Object.keys(notes).length;
 
   /*
+    Roving tabindex (ARIA tree pattern): the whole book is ONE tab stop, and
+    arrows move within it. Without this, an unfolded tree put ~1,580 controls in
+    the tab order — and with the row action buttons now tabIndex={-1}, this is
+    also the only way to reach the tree by keyboard at all.
+
+    Tracked here rather than in the store deliberately: like flashN and returnTo
+    in App, where focus sits is view state that has no business on the undo
+    stack. Falling back to the first item covers the row being folded away
+    (fold-all, applying a thread) while it held focus.
+  */
+  const [focusedKey, setFocusedKey] = useState<string | null>(null);
+  const treeMeta = useMemo(() => annotateTree(display), [display]);
+  const tabbableKey = useMemo(() => {
+    const keys = display.map(itemKey);
+    return focusedKey && keys.includes(focusedKey) ? focusedKey : (keys[0] ?? null);
+  }, [display, focusedKey]);
+
+  /*
     Margin-note layout (spec §6): notes are absolutely positioned inside their
     own .row-group, so left alone they collide when annotated rows sit close.
     This pass measures every margin note, computes non-overlapping offsets
@@ -77,10 +96,9 @@ export default function ReadingColumn({
       const groups = ws.map((w) => w.closest<HTMLElement>('.row-group')!);
       const anchors = groups.map((g) => g.offsetTop + NOTE_TOP);
       const heights = ws.map((w) => w.offsetHeight);
+      // data-n lives on .row-group itself (it is the treeitem), not on the .row
       const activeIdx = editingNote
-        ? groups.findIndex(
-            (g) => g.querySelector<HTMLElement>('.row')?.dataset.n === editingNote,
-          )
+        ? groups.findIndex((g) => g.dataset.n === editingNote)
         : -1;
       const tops = computeNoteTops(anchors, heights, GAP, activeIdx >= 0 ? activeIdx : null);
       ws.forEach((w, i) => {
@@ -176,8 +194,20 @@ export default function ReadingColumn({
         <div className="rc-book-byline">Ludwig Wittgenstein, 1922 (Ogden translation)</div>
       </header>
       <div ref={firstRowRef} />
-      <section aria-label="Statements">
-        {display.map((item) =>
+      {/* A div, not a <section>: ARIA-in-HTML does not allow role="tree" on a
+          sectioning element, so axe flags it and the mapping is unreliable.
+          aria-multiselectable: pins ARE the selection, and any number can be set. */}
+      <div
+        id="statements"
+        role="tree"
+        aria-label="Statements"
+        aria-multiselectable="true"
+        onFocusCapture={(e) => {
+          const el = (e.target as HTMLElement).closest<HTMLElement>('[data-nav]');
+          if (el) setFocusedKey(el.dataset.n ?? `peek-${el.dataset.peekMembers?.split(',')[0]}`);
+        }}
+      >
+        {display.map((item, i) =>
           item.kind === 'row' ? (
             <StatementRow
               key={item.n}
@@ -190,6 +220,10 @@ export default function ReadingColumn({
               note={notes[item.n]}
               noteEditing={editingNote === item.n}
               marginMode={marginMode}
+              level={treeMeta[i].level}
+              posinset={treeMeta[i].posinset}
+              setsize={treeMeta[i].setsize}
+              tabbable={itemKey(item) === tabbableKey}
               onToggle={onToggle}
               onPin={onPin}
               onSelectTerm={onSelectTerm}
@@ -207,11 +241,15 @@ export default function ReadingColumn({
               members={item.members}
               label={item.label}
               activeTerm={activeTerm}
+              level={treeMeta[i].level}
+              posinset={treeMeta[i].posinset}
+              setsize={treeMeta[i].setsize}
+              tabbable={itemKey(item) === tabbableKey}
               onPromote={onPromote}
             />
           ),
         )}
-      </section>
+      </div>
     </main>
   );
 }

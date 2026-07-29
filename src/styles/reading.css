@@ -140,12 +140,17 @@
   background: var(--hover-surface);
 }
 
-.row:focus {
+/* The treeitem (and so the focus target) is .row-group; the visible focus
+   treatment still lands on the .row inside it, unchanged. */
+.row-group:focus {
   outline: none;
+}
+
+.row-group:focus > .row {
   background: var(--hover-surface);
 }
 
-.row.is-pinned:focus {
+.row-group:focus > .row.is-pinned {
   background: var(--accent-wash);
 }
 
@@ -247,7 +252,10 @@
   transition: opacity 120ms ease, color 120ms ease;
 }
 
+/* The row actions are tabIndex={-1}, so :focus-within fires exactly when the row
+   itself holds focus — which is when a keyboard reader needs to see them. */
 .row:hover .row-pin,
+.row-group:focus .row-pin,
 .row-pin.is-pinned {
   opacity: 1;
   pointer-events: auto;
@@ -328,7 +336,10 @@
   padding: 2px 11px;
   text-align: center;
 }
-.truthtable th {
+/* thead td: the unlabelled spacer/result columns, which are cells rather than
+   headers but still sit above the rule */
+.truthtable th,
+.truthtable thead td {
   font-weight: 400;
   border-bottom: 1px solid var(--ink24);
 }
@@ -441,7 +452,11 @@
   transition: opacity 120ms ease;
 }
 
-.row-badge-wrap:hover .badge-tip {
+/* The badge carries its count as an accessible name; this tip is the sighted
+   equivalent, so it must also appear for a keyboard reader on the focused row. */
+.row-badge-wrap:hover .badge-tip,
+.row-group:focus .badge-tip,
+.peek-row:focus-visible .badge-tip {
   opacity: 1;
 }
 
@@ -639,7 +654,8 @@
   transition: opacity 120ms ease, color 120ms ease;
 }
 
-.row:hover .row-note-btn {
+.row:hover .row-note-btn,
+.row-group:focus .row-note-btn {
   opacity: 1;
   pointer-events: auto;
 }
@@ -666,7 +682,8 @@
   transition: opacity 120ms ease, color 120ms ease;
 }
 
-.row:hover .row-share-btn {
+.row:hover .row-share-btn,
+.row-group:focus .row-share-btn {
   opacity: 1;
   pointer-events: auto;
 }
@@ -723,6 +740,30 @@
   color: var(--ink100);
 }
 
+/* ---- hit areas ----
+   WCAG 2.5.8 (24×24) applies to every input type, not just touch, so the
+   hit-area extension lives outside the (hover: none) block. Only the three
+   action glyphs need it — .row-toggle is already 26×26.
+
+   inset is -4px, not -8px: at 17px wide these sit 8px apart, and an 8px
+   extension would make neighbouring targets overlap so the last one in the DOM
+   swallowed its neighbour's clicks. -4px gives 25×25 boxes that just touch. */
+
+.row-pin,
+.row-note-btn,
+.row-share-btn {
+  position: relative;
+  margin-left: 8px;
+}
+
+.row-pin::after,
+.row-note-btn::after,
+.row-share-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
 /* ---- touch devices: hover can't reveal, so row controls stay visible ---- */
 
 @media (hover: none) {
@@ -731,8 +772,6 @@
   .row-share-btn {
     opacity: 0.45;
     pointer-events: auto;
-    position: relative;
-    margin-left: 10px; /* keep the enlarged hit areas from overlapping */
   }
 
   .row-pin.is-pinned {
@@ -740,18 +779,7 @@
   }
 
   .row-toggle {
-    position: relative;
     color: var(--ink40);
-  }
-
-  /* invisible hit-area extension — layout stays untouched */
-  .row-toggle::after,
-  .row-pin::after,
-  .row-note-btn::after,
-  .row-share-btn::after {
-    content: '';
-    position: absolute;
-    inset: -8px;
   }
 
   .note-pencil {

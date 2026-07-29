@@ -1,8 +1,20 @@
 /*
   Keyboard navigation (spec §12): arrows + j/k move between visible statements
-  (roving focus over [data-nav] elements), →/←/⇧→ fold, P pins, Enter opens
-  the note, / focuses search, ? opens the guide, Esc clears, Ctrl/⌘Z / Ctrl+Y
-  (or ⌘⇧Z) drive the in-app history. Never wired to browser Back.
+  (roving focus over [data-nav] elements), →/←/⇧→ fold, P pins, S copies a link,
+  Enter opens the note, / focuses search, ? opens the guide, Esc clears,
+  Ctrl/⌘Z / Ctrl+Y (or ⌘⇧Z) drive the in-app history. Never wired to browser Back.
+
+  Two accessibility constraints shape the dispatch below (both WCAG Level A):
+
+  1. Single-key shortcuts must be escapable (2.1.4). The tree keys (arrows, j, k,
+     p, s, Enter) only fire when focus is already INSIDE the tree — reachable in
+     one Tab thanks to the roving tabindex in ReadingColumn. `/` and `?` stay
+     global because they are the way in to search from anywhere, so the whole set
+     is additionally gated on `enabled`, the reader's kill switch.
+
+  2. Arrow keys must not be swallowed page-wide. Capturing them unconditionally
+     meant the page could not be scrolled from the keyboard at all; the focus
+     gate is what gives arrow-scrolling back everywhere outside the tree.
 */
 
 import { useEffect, useRef } from 'react';
@@ -12,12 +24,15 @@ export interface KeyboardHandlers {
   expandSubtree: (n: string) => void;
   promotePeeks: (members: string[]) => void;
   togglePin: (n: string) => void;
+  shareStatement: (n: string) => void;
   editNote: (n: string) => void;
   focusSearch: () => void;
   openHelp: () => void;
   escape: () => void;
   undo: () => void;
   redo: () => void;
+  /** the reader's single-key shortcut setting (useShortcuts) */
+  enabled: boolean;
 }
 
 interface NavTarget {
@@ -38,6 +53,7 @@ function navTargets(): NavTarget[] {
   }));
 }
 
+/** The tree node holding focus, or null when focus is anywhere else. */
 function currentTarget(): NavTarget | null {
   const el = document.activeElement?.closest<HTMLElement>('[data-nav]');
   if (!el) return null;
@@ -52,9 +68,13 @@ export function useKeyboardNav(handlers: KeyboardHandlers) {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       const typing =
-        !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+        !!target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable);
 
-      // history works everywhere except while typing
+      // history works everywhere except while typing, and is never a single-key
+      // shortcut, so it is exempt from the kill switch
       if ((e.ctrlKey || e.metaKey) && !typing) {
         const k = e.key.toLowerCase();
         if (k === 'z') {
@@ -74,27 +94,38 @@ export function useKeyboardNav(handlers: KeyboardHandlers) {
         return;
       }
 
+      // Escape is not a single-key shortcut in the 2.1.4 sense (it is a
+      // non-printing key that cannot be produced by speech input), so it stays
+      // live even with shortcuts switched off.
+      if (e.key === 'Escape') {
+        h.current.escape();
+        return;
+      }
+      if (!h.current.enabled) return;
+
+      const t = currentTarget();
+      const inTree = t !== null;
+
       const move = (delta: 1 | -1) => {
         e.preventDefault();
         const targets = navTargets();
         if (!targets.length) return;
-        const cur = document.activeElement?.closest<HTMLElement>('[data-nav]');
-        const idx = targets.findIndex((t) => t.el === cur);
+        const idx = targets.findIndex((x) => x.el === t?.el);
         const next = targets[idx === -1 ? (delta === 1 ? 0 : targets.length - 1) : idx + delta];
         next?.el.focus();
       };
 
       switch (e.key) {
+        // ---- tree keys: only while focus is inside the tree ----
         case 'ArrowDown':
         case 'j':
-          move(1);
+          if (inTree) move(1);
           return;
         case 'ArrowUp':
         case 'k':
-          move(-1);
+          if (inTree) move(-1);
           return;
         case 'ArrowRight': {
-          const t = currentTarget();
           if (!t) return;
           e.preventDefault();
           if (t.peekMembers) h.current.promotePeeks(t.peekMembers);
@@ -105,7 +136,6 @@ export function useKeyboardNav(handlers: KeyboardHandlers) {
           return;
         }
         case 'ArrowLeft': {
-          const t = currentTarget();
           if (t?.n && t.expanded) {
             e.preventDefault();
             h.current.toggleRow(t.n, false);
@@ -114,18 +144,25 @@ export function useKeyboardNav(handlers: KeyboardHandlers) {
         }
         case 'p':
         case 'P': {
-          const t = currentTarget();
           if (t?.n) h.current.togglePin(t.n);
           return;
         }
+        case 's':
+        case 'S': {
+          // The per-row share button is no longer tabbable (it would put ~1,580
+          // invisible stops in the tab order), so this is its keyboard route.
+          if (t?.n) h.current.shareStatement(t.n);
+          return;
+        }
         case 'Enter': {
-          const t = currentTarget();
           if (t?.n && document.activeElement === t.el) {
             e.preventDefault();
             h.current.editNote(t.n);
           }
           return;
         }
+
+        // ---- global keys: the way in to search from anywhere ----
         case '/':
           e.preventDefault();
           h.current.focusSearch();
@@ -133,9 +170,6 @@ export function useKeyboardNav(handlers: KeyboardHandlers) {
         case '?':
           e.preventDefault();
           h.current.openHelp();
-          return;
-        case 'Escape':
-          h.current.escape();
           return;
       }
     };

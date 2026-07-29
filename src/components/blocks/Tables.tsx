@@ -76,8 +76,10 @@ export function Table4_442() {
             <th>
               <V x="q" />
             </th>
-            <th />
-            <th />
+            {/* Spacer + result columns: unlabelled in Wittgenstein's original, so
+                <td>, not an empty <th> claiming to head a column it doesn't. */}
+            <td />
+            <td />
           </tr>
         </thead>
         <tbody>

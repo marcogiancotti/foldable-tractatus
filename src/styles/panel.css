@@ -119,8 +119,10 @@
   margin: 0;
 }
 
+/* --ink40, not --ink24: placeholder is text and carries the 4.5:1 floor, while
+   --ink24 is pitched for icon chrome at 3:1 */
 .cp-search-input::placeholder {
-  color: var(--ink24);
+  color: var(--ink40);
 }
 
 .cp-search-kbd {
@@ -338,7 +340,7 @@
 }
 
 .cp-menu-sec-dim {
-  color: var(--ink24);
+  color: var(--ink40); /* text floor (4.5:1), not the --ink24 icon floor */
   letter-spacing: 0.5px;
 }
 
@@ -434,7 +436,7 @@
 }
 
 .cp-inline-input::placeholder {
-  color: var(--ink24);
+  color: var(--ink40); /* text floor — see .cp-search-input::placeholder */
 }
 
 /* ---- save-current-pins row ---- */

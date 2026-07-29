@@ -4,23 +4,37 @@
   The accent is slate blue — the handoff's tokens.css gold values were stale.
 
   Rules of the system: text before boxes; hairlines before fills; one accent,
-  used sparingly; chrome sits at 24% ink until hover; overlays are the only
-  things allowed a shadow.
+  used sparingly; chrome sits quiet until hover; overlays are the only things
+  allowed a shadow.
+
+  CONTRAST FLOOR. The quiet-chrome rule was originally taken literally — chrome
+  at 24% ink — which put almost every control below WCAG 1.4.3/1.4.11: --ink24
+  measured 1.65:1, --ink40 2.22:1, --control-border 1.98:1, and --ink60 4.31:1
+  under the 4.5 needed for the 13px statement numbers. The token names are kept
+  (they are the design vocabulary) but each now sits at or above its floor:
+
+    text (1.4.3, 4.5:1)      --ink60, --ink40, --accent
+    UI/icons (1.4.11, 3:1)   --ink24, --control-border
+    decorative (no floor)    --hairline
+
+  Ratios below are measured against the token's own --paper. When changing any
+  of these, re-measure — the look is a shade firmer, but nothing renders quieter
+  than a reader can see.
 */
 
 :root {
   /* color — light */
   --paper: #fbfaf7;
-  --ink100: rgba(33, 31, 27, 1);
-  --ink60: rgba(33, 31, 27, 0.6);
-  --ink40: rgba(60, 50, 30, 0.4);
-  --ink24: rgba(33, 31, 27, 0.24); /* the floor — nothing renders quieter */
-  --accent: #4e6c90;
+  --ink100: rgba(33, 31, 27, 1); /* 15.76 */
+  --ink60: rgba(33, 31, 27, 0.7); /*  5.95 — text, incl. 13px .row-num */
+  --ink40: rgba(60, 50, 30, 0.7); /*  4.84 — text */
+  --ink24: rgba(33, 31, 27, 0.5); /*  3.20 — icon chrome, the quiet floor */
+  --accent: #3f5a7a; /*  6.81 on paper, 5.45 on --accent-wash (11px badges) */
   --accent-wash: rgba(88, 116, 150, 0.18);
   --hover-surface: rgba(60, 50, 30, 0.045);
   --tap-surface: rgba(60, 50, 30, 0.1);
-  --hairline: rgba(60, 50, 30, 0.1);
-  --control-border: rgba(60, 50, 30, 0.35);
+  --hairline: rgba(60, 50, 30, 0.1); /* decorative rules only — no floor */
+  --control-border: rgba(60, 50, 30, 0.55); /*  3.20 — control boundaries */
   --toast-bg: #211f1b;
   --toast-fg: #fbfaf7;
   --shadow-overlay: 0 4px 16px rgba(60, 50, 30, 0.12);
@@ -42,18 +56,39 @@
   --indent-step: 30px;
 }
 
+/* Readers who ask their OS for more contrast get it: the quiet chrome and the
+   decorative hairlines step up past their floors rather than merely meeting
+   them. Declared once, after both themes, using each theme's own ink. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink24: rgba(33, 31, 27, 0.75);
+    --ink40: rgba(60, 50, 30, 0.85);
+    --hairline: rgba(60, 50, 30, 0.4);
+    --control-border: rgba(60, 50, 30, 0.8);
+    --accent: #2f4665;
+  }
+
+  :root[data-theme='dark'] {
+    --ink24: rgba(233, 230, 223, 0.7);
+    --ink40: rgba(233, 230, 223, 0.8);
+    --hairline: rgba(233, 230, 223, 0.4);
+    --control-border: rgba(233, 230, 223, 0.75);
+    --accent: #b8d2ee;
+  }
+}
+
 :root[data-theme='dark'] {
   --paper: #181613;
-  --ink100: rgba(233, 230, 223, 1);
-  --ink60: rgba(233, 230, 223, 0.6);
-  --ink40: rgba(233, 230, 223, 0.4);
-  --ink24: rgba(233, 230, 223, 0.22);
-  --accent: #93b4d8;
+  --ink100: rgba(233, 230, 223, 1); /* 14.49 */
+  --ink60: rgba(233, 230, 223, 0.6); /*  5.88 — already cleared its floor */
+  --ink40: rgba(233, 230, 223, 0.6); /*  5.88 — text */
+  --ink24: rgba(233, 230, 223, 0.42); /*  3.52 — icon chrome */
+  --accent: #93b4d8; /*  8.39 on paper, 5.62 on --accent-wash */
   --accent-wash: rgba(140, 170, 205, 0.22);
   --hover-surface: rgba(233, 230, 223, 0.06);
   --tap-surface: rgba(233, 230, 223, 0.1);
-  --hairline: rgba(233, 230, 223, 0.12);
-  --control-border: rgba(233, 230, 223, 0.3);
+  --hairline: rgba(233, 230, 223, 0.12); /* decorative rules only — no floor */
+  --control-border: rgba(233, 230, 223, 0.45); /*  3.85 — control boundaries */
   --toast-bg: #e9e6df;
   --toast-fg: #181613;
   --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.4);

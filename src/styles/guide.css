@@ -104,6 +104,54 @@
   margin-bottom: 15px;
 }
 
+/* ---- single-key shortcut kill switch (WCAG 2.1.4) ---- */
+
+.guide-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.guide-toggle:hover {
+  background: var(--hover-surface);
+}
+
+.guide-toggle-box {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 1px 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.guide-toggle-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.guide-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.guide-toggle-name {
+  font-size: 13px;
+  color: var(--ink100);
+}
+
+.guide-toggle-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink60);
+}
+
 .guide-icon-row {
   display: flex;
   align-items: flex-start;

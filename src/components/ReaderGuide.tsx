@@ -3,6 +3,9 @@ import { useEffect, useRef } from 'react';
 interface ReaderGuideProps {
   open: boolean;
   onClose: () => void;
+  /** the single-key shortcut kill switch (WCAG 2.1.4) — see lib/useShortcuts */
+  shortcutsOn: boolean;
+  onShortcutsChange: (next: boolean) => void;
 }
 
 interface IconLegendRow {
@@ -40,6 +43,9 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     title: 'Move',
     rows: [
+      // The tree is a single tab stop (roving tabindex), so Tab is the way in —
+      // worth documenting, since the row controls are no longer tabbable.
+      { combos: [['Tab']], joiner: 'or', label: 'Enter or leave the statements' },
       { combos: [['↑'], ['k']], joiner: '/', label: 'Previous statement' },
       { combos: [['↓'], ['j']], joiner: '/', label: 'Next statement' },
     ],
@@ -57,6 +63,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     rows: [
       { combos: [['P']], joiner: 'or', label: 'Pin or unpin' },
       { combos: [['Enter']], joiner: 'or', label: 'Add or edit annotation' },
+      { combos: [['S']], joiner: 'or', label: 'Copy a link to this statement' },
     ],
   },
   {
@@ -73,7 +80,12 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
 
 const TITLE_ID = 'reader-guide-title';
 
-export default function ReaderGuide({ open, onClose }: ReaderGuideProps) {
+export default function ReaderGuide({
+  open,
+  onClose,
+  shortcutsOn,
+  onShortcutsChange,
+}: ReaderGuideProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -132,6 +144,29 @@ export default function ReaderGuide({ open, onClose }: ReaderGuideProps) {
         </div>
 
         <div className="guide-kbd-heading">Keyboard shortcuts</div>
+
+        {/*
+          WCAG 2.1.4: j/k/p/s and / and ? are single-character shortcuts, so the
+          reader must be able to switch them off — speech-input and switch
+          devices emit bare characters and would otherwise fire them constantly.
+          The tree keys are additionally scoped to focus inside the tree.
+        */}
+        <label className="guide-toggle">
+          <input
+            type="checkbox"
+            className="guide-toggle-box"
+            checked={shortcutsOn}
+            onChange={(e) => onShortcutsChange(e.target.checked)}
+          />
+          <span className="guide-toggle-text">
+            <span className="guide-toggle-name">Single-key shortcuts</span>
+            <span className="guide-toggle-desc">
+              Turn off if you use speech input or a switch device. Ctrl/⌘ combos and Esc
+              keep working either way.
+            </span>
+          </span>
+        </label>
+
         {SHORTCUT_GROUPS.map((g, gi) => (
           <div
             className="guide-group"

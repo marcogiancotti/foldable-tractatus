@@ -175,6 +175,10 @@ function renderStyledRun(
         <button
           key={key}
           className={`idx-term ${t.hit ? 'is-hit' : ''}`}
+          // Hundreds of curated terms are marked inline; as tab stops they would
+          // bury the reading flow. Reachable by pointer and by screen reader,
+          // and the same trace is available from the search box.
+          tabIndex={-1}
           title={`trace "${t.canonical}"`}
           onClick={(e) => {
             e.stopPropagation();
