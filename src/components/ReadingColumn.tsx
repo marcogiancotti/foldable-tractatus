@@ -121,7 +121,8 @@ export default function ReadingColumn({
           </p>
           <p className="rc-intro">
             The Tractatus has an unusual shape: it is not a sequence of chapters but a{' '}
-            <strong>tree</strong> of statements and sub-statements and sub-sub-statements. In
+            <strong>tree</strong> of statements and sub-statements and sub-sub-statements. At its root, it is made of
+            only seven brief statements. In
             other words, it is not a linear read but a branching set of rabbit-holes.
           </p>
           <p className="rc-intro">
