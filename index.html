@@ -3,23 +3,158 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Foldable Tractatus</title>
+    <title>The Foldable Tractatus — Wittgenstein's Tractatus as a Foldable Tree</title>
     <meta
       name="description"
       content="Wittgenstein's Tractatus Logico-Philosophicus as a foldable tree of statements. Read it folded, pin what matters, keep notes in the margin."
     />
+
+    <!--
+      Canonical. Load-bearing: every view of this app is a query-string variant
+      of `/` (?p= pins, ?e= folds, ?t= term, ?path=, ?statement=, ?bundle=), so
+      each shared link would otherwise register as a separate URL serving the
+      same document and split the ranking signals between them. One
+      unparameterised canonical collapses the whole space back onto `/`.
+
+      The origin is duplicated in src/lib/site.ts (SITE_URL) because this file is
+      static HTML with no build-time templating. The prerender plugin compares
+      the two and fails the build if they drift.
+    -->
+    <link rel="canonical" href="https://foldabletractatus.aethermug.com/" />
+
+    <!-- max-image-preview:large is what allows the social image to render
+         full-width in Google Discover and image-rich results. -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <meta name="author" content="Marco Giancotti" />
+    <link rel="author" href="https://marcogiancotti.com" />
+    <link rel="me" href="https://marcogiancotti.com" />
+    <link rel="me" href="https://aethermug.com" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Foldable Tractatus" />
+    <meta
+      property="og:title"
+      content="The Foldable Tractatus — Wittgenstein's Tractatus as a Foldable Tree"
+    />
+    <meta
+      property="og:description"
+      content="Wittgenstein's Tractatus Logico-Philosophicus as a foldable tree of statements. Read it folded, pin what matters, keep notes in the margin."
+    />
+    <meta property="og:url" content="https://foldabletractatus.aethermug.com/" />
+    <meta
+      property="og:image"
+      content="https://foldabletractatus.aethermug.com/og-image.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="The Foldable Tractatus — proposition 7: Whereof one cannot speak, thereof one must be silent."
+    />
+    <meta property="og:locale" content="en_GB" />
+
+    <!-- X (formerly Twitter). The `twitter:` prefix is the card protocol's own
+         key and did not change with the rebrand, so these names stay as-is. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="The Foldable Tractatus — Wittgenstein's Tractatus as a Foldable Tree"
+    />
+    <meta
+      name="twitter:description"
+      content="Wittgenstein's Tractatus Logico-Philosophicus as a foldable tree of statements. Read it folded, pin what matters, keep notes in the margin."
+    />
+    <meta
+      name="twitter:image"
+      content="https://foldabletractatus.aethermug.com/og-image.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="The Foldable Tractatus — proposition 7: Whereof one cannot speak, thereof one must be silent."
+    />
+
+    <!-- --paper from src/styles/tokens.css, per theme. -->
+    <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#181613" media="(prefers-color-scheme: dark)" />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate icon" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      Structured data. Static because none of it varies per view. The Person
+      node is the part that matters beyond the visible footer link: its sameAs
+      list ties this site, marcogiancotti.com and aethermug.com together as one
+      authored entity.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://foldabletractatus.aethermug.com/#website",
+            "url": "https://foldabletractatus.aethermug.com/",
+            "name": "The Foldable Tractatus",
+            "description": "Wittgenstein's Tractatus Logico-Philosophicus as a foldable tree of statements.",
+            "inLanguage": "en",
+            "author": { "@id": "https://marcogiancotti.com/#person" },
+            "publisher": { "@id": "https://marcogiancotti.com/#person" },
+            "about": { "@id": "https://foldabletractatus.aethermug.com/#book" },
+            "license": "https://opensource.org/licenses/MIT"
+          },
+          {
+            "@type": "Person",
+            "@id": "https://marcogiancotti.com/#person",
+            "name": "Marco Giancotti",
+            "url": "https://marcogiancotti.com",
+            "sameAs": [
+              "https://marcogiancotti.com",
+              "https://aethermug.com",
+              "https://github.com/marcogiancotti"
+            ]
+          },
+          {
+            "@type": "Book",
+            "@id": "https://foldabletractatus.aethermug.com/#book",
+            "name": "Tractatus Logico-Philosophicus",
+            "author": {
+              "@type": "Person",
+              "name": "Ludwig Wittgenstein",
+              "sameAs": "https://en.wikipedia.org/wiki/Ludwig_Wittgenstein"
+            },
+            "translator": { "@type": "Person", "name": "C. K. Ogden" },
+            "datePublished": "1922",
+            "inLanguage": "en",
+            "isBasedOn": "https://www.gutenberg.org/ebooks/5740",
+            "genre": "Philosophy",
+            "about": ["Logic", "Metaphysics", "Philosophy of language"]
+          }
+        ]
+      }
+    </script>
+    <!--
+      Fonts are self-hosted (src/styles/fonts.css), so there is no third-party
+      stylesheet on the critical path and no reader IP disclosed to Google. These
+      two faces carry the body text and so gate the largest paint; the rest are
+      fetched on demand by unicode-range and weight.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/hanken-grotesk-300-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0..1,0&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/hanken-grotesk-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <script>
       // Set the theme before first paint to avoid a flash of the wrong theme.

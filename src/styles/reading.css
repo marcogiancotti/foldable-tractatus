@@ -798,3 +798,110 @@
     color: var(--ink60);
   }
 }
+
+/* ── Colophon (src/components/SiteFooter.tsx) ─────────────────────────────────
+   Apparatus, not prose: same step down as .rc-intro-fine, with a hairline to
+   separate it from the last statement row. Kept quiet on purpose — it is the
+   last thing on a very long page, and it should read as a signature, not a
+   sales pitch. */
+
+/* The gap is generous on purpose: the last statement should feel like the end of
+   the book, not like it runs into the credits. */
+.site-footer {
+  border-top: 1px solid var(--hairline);
+  margin: 200px 0 0;
+  padding: 14px 0 96px;
+  max-width: 540px;
+}
+
+@media (max-width: 719px) {
+  .site-footer {
+    margin-top: 128px;
+  }
+}
+
+/* Trigger: the .cp-more-trigger disclosure from panel.css, at the quiet end of
+   the scale — shut, the whole colophon is this one line. The negative margin
+   lets the hover surface bleed past the text without shifting the label off the
+   prose column's left edge. */
+.sf-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 -8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms ease;
+}
+
+.sf-trigger:hover {
+  background: var(--hover-surface);
+}
+
+.sf-caret.msym {
+  flex: none;
+  font-size: 18px;
+  color: var(--ink24);
+  transition: transform 150ms ease, color 120ms ease;
+  user-select: none;
+}
+
+.sf-trigger:hover .sf-caret.msym {
+  color: var(--ink60);
+}
+
+.sf-caret.msym.is-open {
+  transform: rotate(90deg);
+}
+
+.sf-label {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink40);
+  transition: color 120ms ease;
+  user-select: none;
+}
+
+.sf-trigger:hover .sf-label {
+  color: var(--ink100);
+}
+
+/* Aligns the body under the label rather than the caret. */
+.sf-body {
+  padding-left: 27px;
+  margin-top: 6px;
+}
+
+.sf-line {
+  margin: 0 0 10px;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink60);
+  text-wrap: pretty;
+}
+
+.sf-line:last-child {
+  margin-bottom: 0;
+}
+
+.sf-quiet {
+  font-size: 14px;
+  color: var(--ink40);
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.site-footer a:hover {
+  color: var(--ink100);
+}
