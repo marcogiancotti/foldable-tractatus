@@ -1,0 +1,77 @@
+#
+# Deploy to Vercel on a token, rather than through Vercel's Git integration.
+#
+# Nothing has to be linked this way: Vercel needs no access to the repository,
+# and the deployment pipeline is described here, in version control, instead of
+# in a dashboard. The project is addressed by VERCEL_PROJECT_ID, so its domain
+# and environment variables stay where they are.
+#
+# `vercel pull` fetches the project's environment (including VITE_PLAUSIBLE_*
+# and VITE_SYNC_ENDPOINT) before building, which is what keeps build-time
+# variables working.
+#
+# Required repository secrets:
+#   VERCEL_TOKEN       Account Settings → Tokens (scope: this project's team)
+#   VERCEL_ORG_ID      from .vercel/project.json after `vercel link`
+#   VERCEL_PROJECT_ID  likewise
+#
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Lets a deploy be triggered by hand — to check the token, or to re-deploy
+  # after changing an environment variable in the dashboard.
+  workflow_dispatch:
+
+# A superseded deploy is wasted work: cancel it when a newer commit lands.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # The same gate as CI. `main` is protected and tested before merge, but a
+      # deploy job that cannot fail is a deploy job that will one day ship a
+      # broken build.
+      - run: npm ci
+      - run: npm test
+
+      - name: Install the Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull the project's production environment
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy
+        id: deploy
+        run: |
+          url="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed to $url" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

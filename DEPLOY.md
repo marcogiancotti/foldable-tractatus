@@ -18,6 +18,26 @@ the Vite preset is auto-detected and its defaults are correct:
 No rewrite/redirect rules are needed — the app is a single page whose entire
 view state lives in the query string, so there are no client-side routes.
 
+### Deploying without a Git integration
+
+Connecting a host to a Git provider is a convenience, not a requirement.
+`.github/workflows/` deploys this project on a Vercel **token** instead:
+`deploy.yml` on every push to `main`, `preview.yml` per pull request. Both
+address the Vercel project by id, so its domain and dashboard environment
+variables need no change.
+
+Three repository secrets are needed. `VERCEL_TOKEN` comes from Vercel's Account
+Settings → Tokens; the other two are printed into `.vercel/project.json`
+(gitignored) by running `vercel link` once against the existing project:
+
+```
+VERCEL_TOKEN  VERCEL_ORG_ID  VERCEL_PROJECT_ID
+```
+
+`vercel pull` fetches the project's environment before building, so build-time
+variables keep working. If the project also has a Git integration connected,
+disconnect it, or every commit deploys twice.
+
 To enable cloud sync, set the environment variable `VITE_SYNC_ENDPOINT` to your
 own backend's URL (section 2) and redeploy. It is a **build-time** variable:
 changing it requires a rebuild, not just a restart.
