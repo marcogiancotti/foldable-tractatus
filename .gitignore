@@ -4,10 +4,13 @@ dist/
 coverage/
 
 # Environment & local config
-.env
-.env.*
+# The negation must come AFTER the pattern it exempts: last match wins.
+.env*
 !.env.example
 *.local
+
+# Vercel CLI link + pulled environment (holds the project's env vars)
+.vercel/
 
 # Design exports (kept locally, never committed)
 docs/*.zip
