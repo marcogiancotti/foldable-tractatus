@@ -1,4 +1,5 @@
 @import 'katex/dist/katex.min.css';
+@import './fonts.css';
 @import './tokens.css';
 @import './reading.css';
 @import './panel.css';

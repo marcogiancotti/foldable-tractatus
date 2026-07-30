@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!--
+    Source for public/og-image.png — the social card shown by every platform
+    that unfurls a link. OG and X both require a raster image, so this is
+    rasterised once to a 1200x630 PNG and the PNG is what ships; this file is
+    kept only so the card can be regenerated. See DEPLOY.md.
+
+    Tokens are taken verbatim from src/styles/tokens.css (light theme): --paper
+    #fbfaf7, ink #211f1b, --accent #3f5a7a. Tints use fill + fill-opacity rather
+    than rgba(), which SVG 1.1 does not accept in fill (browsers tolerate it;
+    rasterisers fall back to black). The mark is the four-chevron "fold
+    all" glyph from public/favicon.svg. Fonts are deliberately generic families,
+    not the app's webfonts, so rasterising needs no font installation.
+  -->
+  <rect width="1200" height="630" fill="#fbfaf7" />
+
+  <!-- accent rule down the left edge -->
+  <rect x="0" y="0" width="10" height="630" fill="#3f5a7a" />
+
+  <!-- the fold mark, scaled from the 32x32 favicon grid -->
+  <g transform="translate(96 74) scale(2.4)" fill="none" stroke="#211f1b" stroke-width="3"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5.5 L16 10.5 L21 5.5" />
+    <path d="M11 26.5 L16 21.5 L21 26.5" />
+    <path d="M5.5 11 L10.5 16 L5.5 21" />
+    <path d="M26.5 11 L21.5 16 L26.5 21" />
+  </g>
+
+  <text x="96" y="252" font-family="Georgia, 'Times New Roman', serif" font-size="92"
+        font-weight="600" fill="#211f1b">The Foldable Tractatus</text>
+
+  <text x="96" y="322" font-family="Georgia, 'Times New Roman', serif" font-size="33"
+        fill="#211f1b" fill-opacity="0.7">Wittgenstein&#8217;s <tspan font-style="italic">Tractatus
+    Logico-Philosophicus</tspan>, read as the tree it already is.</text>
+
+  <!-- hairline above the quoted proposition -->
+  <rect x="96" y="386" width="1008" height="1" fill="#211f1b" fill-opacity="0.2" />
+
+  <text x="96" y="470" font-family="ui-monospace, 'DejaVu Sans Mono', monospace"
+        font-size="30" fill="#3f5a7a">7</text>
+  <text x="146" y="470" font-family="Georgia, 'Times New Roman', serif" font-size="40"
+        font-style="italic" fill="#211f1b">Whereof one cannot speak, thereof one must be
+    silent.</text>
+
+  <text x="96" y="566" font-family="Georgia, 'Times New Roman', serif" font-size="25"
+        fill="#211f1b" fill-opacity="0.5">526 statements &#183; fold, pin, annotate, share</text>
+
+  <text x="1104" y="566" text-anchor="end" font-family="Georgia, 'Times New Roman', serif"
+        font-size="25" fill="#211f1b" fill-opacity="0.5">aethermug.com</text>
+</svg>

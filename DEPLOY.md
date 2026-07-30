@@ -16,7 +16,70 @@ the Vite preset is auto-detected and its defaults are correct:
 - Node version: see `.nvmrc`
 
 No rewrite/redirect rules are needed — the app is a single page whose entire
-view state lives in the query string, so there are no client-side routes.
+view state lives in the query string, so there are no client-side routes. The
+committed `vercel.json` therefore sets response headers only (`nosniff`, a
+referrer policy, and a short cache on `robots.txt`/`sitemap.xml`); it declares no
+routing.
+
+The author's deployment is <https://foldabletractatus.aethermug.com>.
+
+### The canonical origin is written down twice
+
+`index.html` hardcodes `<link rel="canonical">` because it is static HTML parsed
+before any JS runs, and `src/lib/site.ts` exports the same origin as `SITE_URL`
+for the sitemap, the footer and the JSON-LD. **If you fork this to your own
+domain, change both.** The prerender plugin compares them and fails the build on
+a mismatch, so you cannot ship a canonical pointing at someone else's site by
+accident — but a build that fails for that reason is telling you to edit
+`index.html`, not to delete the check.
+
+Also set the custom domain as the **primary** domain in the host's dashboard, so
+the `*.vercel.app` hostname redirects to it rather than serving a second copy of
+the site.
+
+### SEO surface
+
+`npm run build` bakes the complete 526-statement text into `dist/index.html` —
+see `vite/prerender.ts` for why and how. This makes the document **170 KB
+(43 KB gzipped)** instead of ~7 KB, which is the deliberate cost of being
+readable by crawlers that do not execute JavaScript; the JS bundle it sits
+beside is 205 KB gzipped. `vite/prerender.test.ts` guards the output.
+
+The same build step emits `dist/sitemap.xml`, listing `/` only — every other URL
+is a query-string variant that canonicalises back to it. `public/robots.txt`
+allows all crawlers including the answer engines, deliberately.
+
+`public/og-image.png` is the social card, rasterised from `assets/og-image.svg`.
+It is committed rather than generated at build time. To regenerate it after
+editing the SVG:
+
+```sh
+inkscape assets/og-image.svg --export-type=png \
+  --export-filename=public/og-image.png --export-width=1200 --export-height=630
+```
+
+### Fonts
+
+Webfonts are **self-hosted** from `public/fonts/` and declared in
+`src/styles/fonts.css`. They used to come from two blocking `fonts.googleapis.com`
+stylesheets, which put a third-party DNS + TLS + round-trip ahead of first text
+paint and disclosed every reader's IP to Google — odd for a project whose
+analytics are deliberately self-hosted. Both files are committed, so a clone
+needs neither network nor Python to build.
+
+To change the font stack, edit and run `scripts/build-fonts.sh` (needs `curl` and
+`fonttools`), then commit its output. Read its header comment first — subsetting
+an icon font is not the obvious operation it looks like, and getting it wrong
+produces a UI that renders the literal word `chevron_right`. `vite/fonts.test.ts`
+fails if a component references an icon the committed subset does not carry, which
+is the tripwire for "someone added an icon and did not re-run the script".
+
+Preview deployments need no `robots.txt` special-casing: Vercel serves them with
+`X-Robots-Tag: noindex` already. Worth confirming once with `curl -I` on a
+preview URL if you deploy elsewhere.
+
+After the first deploy, submit the sitemap in Google Search Console and Bing
+Webmaster Tools. Nothing in the build causes indexing on its own.
 
 ### Deploying without a Git integration
 

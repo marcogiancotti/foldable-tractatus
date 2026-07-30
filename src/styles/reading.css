@@ -798,3 +798,53 @@
     color: var(--ink60);
   }
 }
+
+/* ── Colophon (src/components/SiteFooter.tsx) ─────────────────────────────────
+   Apparatus, not prose: same step down as .rc-intro-fine, with a hairline to
+   separate it from the last statement row. Kept quiet on purpose — it is the
+   last thing on a very long page, and it should read as a signature, not a
+   sales pitch. */
+
+/* The gap is generous on purpose: the last statement should feel like the end of
+   the book, not like it runs into the credits. */
+.site-footer {
+  border-top: 1px solid var(--hairline);
+  margin: 200px 0 0;
+  padding: 28px 0 96px;
+  max-width: 540px;
+}
+
+@media (max-width: 719px) {
+  .site-footer {
+    margin-top: 128px;
+  }
+}
+
+.sf-line {
+  margin: 0 0 10px;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink60);
+  text-wrap: pretty;
+}
+
+.sf-line:last-child {
+  margin-bottom: 0;
+}
+
+.sf-quiet {
+  font-size: 14px;
+  color: var(--ink40);
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.site-footer a:hover {
+  color: var(--ink100);
+}

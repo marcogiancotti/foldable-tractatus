@@ -1,0 +1,27 @@
+# The Foldable Tractatus — https://foldabletractatus.aethermug.com
+#
+# Everything here is either the public-domain Ogden translation of 1922 or the
+# app's own MIT-licensed interface. Reader annotations never reach the server at
+# all: they live in localStorage, and the optional "save notes to a link"
+# feature stores only client-encrypted ciphertext on a separate origin. There is
+# nothing here to withhold.
+
+User-agent: *
+Allow: /
+
+# Answer engines are allowed on purpose, not by omission. A reference text like
+# this earns its readers through citation, and a crawl that leads someone to the
+# full interactive book is the point of publishing it.
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://foldabletractatus.aethermug.com/sitemap.xml

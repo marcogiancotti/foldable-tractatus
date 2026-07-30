@@ -4,6 +4,7 @@ import { computeNoteTops } from '../lib/noteLayout';
 import { annotateTree, itemKey } from '../model/ariaTree';
 import { ROOT_IDS, STATEMENTS } from '../model/tree';
 import PeekRange from './PeekRange';
+import SiteFooter from './SiteFooter';
 import StatementRow from './StatementRow';
 
 interface Props {
@@ -154,8 +155,7 @@ export default function ReadingColumn({
             </strong>
           </p>
           <p className="rc-intro rc-intro-fine">
-            This is the public-domain C. K. Ogden translation of the Tractatus. For Bertrand
-            Russell's introduction, see{' '}
+            For Bertrand Russell's introduction, see{' '}
             <a href="https://www.gutenberg.org/ebooks/5740" target="_blank" rel="noreferrer">
               Project Gutenberg
             </a>
@@ -250,6 +250,10 @@ export default function ReadingColumn({
           ),
         )}
       </div>
+      {/* Outside the role="tree" div: the colophon's links must not land inside
+          the tree's roving-tabindex order, where they would be unreachable by
+          Tab and would break arrow navigation. */}
+      <SiteFooter />
     </main>
   );
 }

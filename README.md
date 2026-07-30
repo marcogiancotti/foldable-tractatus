@@ -1,5 +1,7 @@
 # The Foldable Tractatus
 
+**Live: <https://foldabletractatus.aethermug.com>**
+
 An interactive reader for Wittgenstein's *Tractatus Logico-Philosophicus*
 (Ogden 1922 translation). The book's decimal numbering **is** a tree — this app
 lets you read it as one: fold and unfold branches, pin the statements that
@@ -98,7 +100,7 @@ The build here ships with it **off**; it requires explicit configuration.
 
 ## License
 
-Code: [MIT](LICENSE) © Marco Giancotti.
+Code: [MIT](LICENSE) © [Marco Giancotti](https://aethermug.com).
 
 The C. K. Ogden (1922) English translation of the *Tractatus* is in the public
 domain. The curated term index, the reading paths, and the spec in `docs/` are
