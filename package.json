@@ -13,7 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "katex": "^0.17.0",
+    "katex": "^0.18.10",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -24,7 +24,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
-    "vite": "^8.1.5",
-    "vitest": "^4.1.10"
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12"
   }
 }
