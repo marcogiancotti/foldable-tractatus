@@ -117,7 +117,7 @@ Same caveat as before: I can't take confirming mobile screenshots because the sa
 - **Phase:** Content
 - **Human:** 40 words · ~1 min to write · 1 image
 - **LLM:** Opus 4.8 · Claude Code · 10 min 12 s · +27 −16 lines
-- **Outcome:** bug reported, correction, research
+- **Outcome:** bug reported, correction, research, constraint
 
 ### Prompt
 
@@ -212,8 +212,8 @@ One honest caveat: I still can't render a screenshot to confirm — Chromium won
 
 - **Phase:** Content
 - **Human:** 29 words · ~44 s to write
-- **LLM:** Opus 4.8 · Claude Code · 10 min 10 s
-- **Outcome:** verification, feature designed, process
+- **LLM:** Opus 4.8 · Claude Code · 10 min 10 s · +12 −1 lines
+- **Outcome:** verification, feature designed, process, question answered, UX improved, bug reported
 
 ### Prompt
 

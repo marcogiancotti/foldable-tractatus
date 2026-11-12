@@ -10,8 +10,8 @@ Claude Code · Polish · 3 prompts · 57 words
 
 - **Phase:** Polish
 - **Human:** 43 words · ~1 min to write
-- **LLM:** Opus 5 · Claude Code · 7 min 16 s
-- **Outcome:** bug reported, feature designed, docs written
+- **LLM:** Opus 5 · Claude Code · 7 min 16 s · +356 −13 lines
+- **Outcome:** bug reported, feature designed, docs written, question answered, feature built, accessibility, bug fixed, verification, UX improved
 
 ### Prompt
 

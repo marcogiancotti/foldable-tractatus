@@ -252,8 +252,8 @@ Ready for your next batch whenever you are.
 
 - **Phase:** Implementation
 - **Human:** 272 words · ~7 min to write
-- **LLM:** Fable 5 · Claude Code · 93 min 7 s · +916 −0 lines
-- **Outcome:** feature designed, UX improved, feature built, constraint
+- **LLM:** Fable 5 · Claude Code · 93 min 7 s · +2138 −228 lines
+- **Outcome:** feature designed, UX improved, feature built, constraint, decision, bug fixed
 
 ### Prompt
 
@@ -531,8 +531,8 @@ Committed as `de32bec` — 3 files (panel.css, TermCard, App), working tree clea
 
 - **Phase:** Implementation
 - **Human:** 43 words · ~1 min to write
-- **LLM:** Fable 5 · Claude Code · 11 min 58 s
-- **Outcome:** decision, feature designed, question asked
+- **LLM:** Fable 5 · Claude Code · 11 min 58 s · +656 −224 lines
+- **Outcome:** decision, feature designed, question asked, feature built
 
 ### Prompt
 

@@ -10,8 +10,8 @@ Claude Code · Implementation · 13 prompts · 345 words
 
 - **Phase:** Implementation
 - **Human:** 213 words · ~5 min to write
-- **LLM:** Fable 5 · Claude Code · 3 min 27 s
-- **Outcome:** research, correction, decision, question asked
+- **LLM:** Fable 5 · Claude Code · 9 min 16 s
+- **Outcome:** research, correction, decision, question asked, process, question answered, constraint
 
 The author sent this prompt 2 times. The earlier attempts:
 
@@ -74,8 +74,8 @@ Sources: [Val Town pricing](https://www.val.town/pricing) · [Val Town limits](h
 
 - **Phase:** Implementation
 - **Human:** 81 words · ~2 min to write
-- **LLM:** Fable 5 · Claude Code · 29 min 14 s
-- **Outcome:** docs written, constraint, process, research, tooling, feature built
+- **LLM:** Fable 5 · Claude Code · 29 min 14 s · +1642 −20 lines
+- **Outcome:** docs written, constraint, process, research, tooling, feature built, question answered, decision, correction
 
 ### Prompt
 
@@ -153,7 +153,7 @@ Those notifications are stale bookkeeping from the earlier session — all four 
 
 - **Phase:** Implementation
 - **Human:** 25 words · ~38 s to write
-- **LLM:** Fable 5 · Claude Code · 2 min 3 s · +23 −86 lines
+- **LLM:** Fable 5 · Claude Code · 2 min 9 s · +23 −86 lines
 - **Outcome:** decision, docs written, tooling
 
 The author sent this prompt 4 times. The earlier attempts:

@@ -11,7 +11,7 @@ Claude Code · Content · 26 prompts · 758 words
 - **Phase:** Content
 - **Human:** 46 words · ~1 min to write
 - **LLM:** Opus 4.8 · Claude Code · 3 min 3 s
-- **Outcome:** research, decision
+- **Outcome:** research, decision, tooling
 
 ### Prompt
 
@@ -126,8 +126,8 @@ Want me to also confirm the recommended citation on Klement's project page (it s
 
 - **Phase:** Content
 - **Human:** 11 words · ~17 s to write
-- **LLM:** Opus 4.8 · Claude Code · 1 min 24 s
-- **Outcome:** constraint, research
+- **LLM:** Opus 4.8 · Claude Code · 1 min 24 s · +32 −0 lines
+- **Outcome:** constraint, research, decision, feature rejected, docs written
 
 ### Prompt
 
@@ -181,7 +181,7 @@ Just say the word and I'll start the import.
 
 - **Phase:** Content
 - **Human:** 43 words · ~1 min to write
-- **LLM:** Opus 4.8 · Claude Code · 40 s
+- **LLM:** Opus 4.8 · Claude Code · 52 s
 - **Outcome:** constraint, research, decision
 
 The author sent this prompt 2 times. The earlier attempts:
@@ -213,8 +213,8 @@ I'll fold this into the import plan. One thing to settle at import time (not now
 
 - **Phase:** Content
 - **Human:** 6 words · ~9 s to write
-- **LLM:** Opus 4.8 · Claude Code · 39 min 31 s · +59 −0 lines
-- **Outcome:** docs written, research, process
+- **LLM:** Opus 4.8 · Claude Code · 39 min 31 s · +1505 −215 lines
+- **Outcome:** docs written, research, process, decision, feature built, constraint, bug fixed
 
 ### Prompt
 
@@ -322,7 +322,7 @@ When you're done, `git checkout main` returns you to your previous state. Two th
 - **Phase:** Content
 - **Human:** 224 words · ~6 min to write
 - **LLM:** Opus 4.8 · Claude Code · 38 min 24 s · +836 −302 lines
-- **Outcome:** verification, correction, bug reported, decision, docs written
+- **Outcome:** verification, correction, bug reported, decision, docs written, process
 
 ### Prompt
 
@@ -617,7 +617,7 @@ And if while you're in there you feel like redrawing any of the other four to ta
 - **Phase:** Content
 - **Human:** 17 words · ~26 s to write
 - **LLM:** Sonnet 5 · Claude Code · 2 min 6 s · +26 −16 lines
-- **Outcome:** tooling, verification, research, docs written
+- **Outcome:** tooling, verification, research, docs written, decision
 
 ### Prompt
 
@@ -783,8 +783,8 @@ The branch now carries the full-text import, the five redrawn 6.1203 figures, an
 
 - **Phase:** Content
 - **Human:** 51 words · ~1 min to write
-- **LLM:** Opus 4.8 · Claude Code · 8 min 12 s · +90 −31 lines
-- **Outcome:** correction, constraint, content, verification
+- **LLM:** Opus 4.8 · Claude Code · 8 min 12 s · +118 −38 lines
+- **Outcome:** correction, constraint, content, verification, decision
 
 ### Prompt
 

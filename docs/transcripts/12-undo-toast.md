@@ -51,7 +51,7 @@ The mechanism (`raiseToast`/`undoPins`) is generic, so wiring it to the other tw
 - **Phase:** Design
 - **Human:** 17 words · ~26 s to write
 - **LLM:** Fable 5 · Claude Design · 9 s
-- **Outcome:** question asked, process
+- **Outcome:** question asked, process, decision, constraint, UX improved
 
 ### Prompt
 
