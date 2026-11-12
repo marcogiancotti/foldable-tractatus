@@ -87,6 +87,13 @@ read if you want to understand the codebase; its behaviour is specified in
 [`docs/foldable-tractatus-spec.md`](docs/foldable-tractatus-spec.md), which the
 code refers to by section number.
 
+## How it was built
+
+The app was built with AI tools, from the first specification to the
+accessibility audit. [`docs/transcripts/`](docs/transcripts/README.md) holds
+the prompts of all 33 sessions, with the replies of the AI and the metadata of
+each prompt. Private data is removed.
+
 ## Running it locally
 
 ```sh
@@ -116,7 +123,7 @@ the build.
 | `src/data/` | The 526-statement Ogden text with its cross-references, the curated term index, and the reading paths |
 | `backend/` | The Val Town val behind encrypted sync, with tests that run against in-memory libsql |
 | `vite/` | Build-only plugins, including the prerender that makes the text crawlable |
-| `docs/` | The functional spec and the analytics catalogue |
+| `docs/` | The functional spec, the analytics catalogue, and the transcripts of the build |
 
 Deployment, to any static host and optionally a Val Town val, is documented in
 [`DEPLOY.md`](DEPLOY.md).
