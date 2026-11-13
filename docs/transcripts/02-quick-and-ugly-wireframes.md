@@ -10,8 +10,8 @@ Claude Design · Design · 2 prompts · 209 words
 
 - **Phase:** Design
 - **Human:** 43 words · ~1 min to write · 3 files
-- **LLM:** Fable 5 · Claude Design · 35 s
-- **Outcome:** process, decision
+- **LLM:** Fable 5 · Claude Design · 35 s · +222 −0 lines
+- **Outcome:** process, decision, constraint
 
 ### Prompt
 

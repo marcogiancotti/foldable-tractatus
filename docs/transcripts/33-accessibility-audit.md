@@ -132,8 +132,8 @@ Want me to implement these? I'd suggest taking them in the order above, one comm
 
 - **Phase:** Polish
 - **Human:** 177 words · ~4 min to write
-- **LLM:** Opus 5 · Claude Code · 49 min 0 s
-- **Outcome:** decision, constraint, process, feature rejected
+- **LLM:** Opus 5 · Claude Code · 49 min 0 s · +1824 −266 lines
+- **Outcome:** decision, constraint, process, feature rejected, question answered, accessibility, bug fixed, test added, verification
 
 ### Prompt
 

@@ -11,7 +11,7 @@ Codex · Content · 4 prompts · 108 words
 - **Phase:** Content
 - **Human:** 97 words · ~2 min to write
 - **LLM:** GPT-5.6 Sol · Codex · 7 min 31 s
-- **Outcome:** process, constraint, decision, research, docs written
+- **Outcome:** process, constraint, decision, research, docs written, question answered
 
 ### Prompt
 

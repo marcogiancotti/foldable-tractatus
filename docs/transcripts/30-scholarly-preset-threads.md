@@ -67,7 +67,7 @@ Two notes: retiring `world-and-facts` and `the-ladder` means any old share link 
 
 - **Phase:** Polish
 - **Human:** 14 words · ~21 s to write
-- **LLM:** Opus 5 · Claude Code · 22 s
+- **LLM:** Opus 5 · Claude Code · 1 min 9 s · +20 −5 lines
 - **Outcome:** question asked, decision
 
 The author sent this prompt 2 times. The earlier attempts:

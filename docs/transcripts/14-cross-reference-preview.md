@@ -11,7 +11,7 @@ Claude Design · Design · 3 prompts · 70 words
 - **Phase:** Design
 - **Human:** 10 words · ~15 s to write
 - **LLM:** Fable 5 · Claude Design · 4 min 31 s · +181 −55 lines
-- **Outcome:** feature designed, decision, content
+- **Outcome:** feature designed, decision, content, constraint
 
 ### Prompt
 
