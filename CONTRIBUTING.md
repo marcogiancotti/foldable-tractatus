@@ -76,7 +76,7 @@ maintainer approval for outside contributions. Nothing is pushed to it directly.
 ## Things that will trip you up
 
 A few parts of this codebase have invariants that aren't obvious from reading a
-single file. [`CLAUDE.md`](CLAUDE.md) documents the architecture in full; these
+single file. [`AGENTS.md`](AGENTS.md) documents the architecture in full; these
 are the ones that most often catch people out.
 
 - **`src/data/tractatus.ts` is generated — do not hand-edit it.** It is the

@@ -1,5 +1,15 @@
 {
   "enabledPlugins": {
     "valtown@claude-plugins-official": true
-  }
+  },
+  "deniedMcpServers": [
+    { "serverName": "claude.ai Claude Docs" },
+    { "serverName": "claude.ai Gmail" },
+    { "serverName": "claude.ai Google Calendar" },
+    { "serverName": "claude.ai Google Drive" },
+    { "serverName": "claude.ai Consensus" },
+    { "serverName": "claude.ai Elicit" },
+    { "serverName": "claude.ai Scholar Gateway" },
+    { "serverName": "claude.ai context7" }
+  ]
 }
