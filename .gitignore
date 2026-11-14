@@ -18,6 +18,5 @@ docs/*.zip
 # OS / editor noise
 .DS_Store
 Thumbs.db
-
-# Local agent tooling lockfile (points at a private skills repo)
-skills-lock.json
+.claude/settings.local.json
+.claude/worktrees/
