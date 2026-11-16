@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/runkids/skillshare/main/schemas/project-config.schema.json
+
+targets:
+  - name: claude
+    skills:
+      mode: copy
+  - name: universal
+    skills:
+      mode: copy
+
+skills:
+  - name: code-reviewer
+    source: git@github.com:bonobo-d/mrc-skills.git//skills/code-reviewer
+
+ignore:
+  - .DS_Store
+  - .git/
+  - __pycache__/
+
+audit:
+  block_threshold: CRITICAL

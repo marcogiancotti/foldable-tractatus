@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "code-reviewer": {
+      "source": "git@github.com:bonobo-d/mrc-skills.git//skills/code-reviewer",
+      "commit": "252cfb74f87cf0c2931e9041efe749046037b57b",
+      "tree_hash": "0c07163d39071fc0b2fb46188b00a69aef9276f9"
+    }
+  }
+}
