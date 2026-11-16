@@ -143,3 +143,19 @@ as stable test data.
 
 Frontend → Vercel (auto-detected Vite, output `dist/`); backend → Val Town free
 plan. Full runbook in [`DEPLOY.md`](DEPLOY.md).
+
+## Skills
+
+Skills are managed by skillshare in project mode. The config is
+`.skillshare/config.yaml`. The lock is `.skillshare/skills.lock.json`. The
+`.claude/skills/` and `.agents/skills/` folders are committed copies.
+
+`skillshare install -p` restores the sources from the lock. It needs network and
+SSH access to `bonobo-d/mrc-skills`. `skillshare sync -p` writes the copies. On a
+fresh clone, run `install -p` before `sync -p`.
+
+Edit a skill in its source. Do not edit the target copies. A sync overwrites
+edits in `.claude/skills/` and `.agents/skills/`.
+
+`verify` is a local skill of this repository. Its source is
+`.skillshare/skills/verify/`. Edit it there and run `skillshare sync -p`.
