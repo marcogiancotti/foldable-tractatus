@@ -1,15 +1,15 @@
 {
   "managed": {
-    "code-reviewer": "5e953e92f4dbca71461bff5a859118949d2f3187833e2816f2e8c3c36f6fd319",
+    "code-reviewer": "54a1b2e581798f2cd756c9d3f6457282dd8d76a89f45622b95a9da654c673560",
     "verify": "a9a6e5d2ca00e19387815e74373f80115d5ab74925f188629423e49de9e15192"
   },
   "mtimes": {
-    "code-reviewer": 1794842256518843581,
+    "code-reviewer": 1794922496045904010,
     "verify": 1785289616530462283
   },
   "naming": {
     "code-reviewer": "flat",
     "verify": "flat"
   },
-  "updated_at": "2026-11-17T00:18:28.309473119+09:00"
+  "updated_at": "2026-11-17T22:34:56.069864573+09:00"
 }
