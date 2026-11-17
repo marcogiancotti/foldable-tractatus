@@ -13,11 +13,13 @@ Triggers a focused, isolated subagent to perform a thorough code review.
 
 ### OpenCode only
 
-On first use in an OpenCode project, run the setup script once:
+On first use in an OpenCode project, run the setup script once. The script is `scripts/generate-opencode-agent.sh` in this skill's folder. Run it from the project root.
 
 ```bash
-skills/code-reviewer/scripts/generate-opencode-agent.sh
+.agents/skills/code-reviewer/scripts/generate-opencode-agent.sh
 ```
+
+If the skill is in a different skills folder, use the `scripts/` path in that folder.
 
 This creates `.opencode/agents/code-reviewer.md` from the canonical role definition at `references/code-reviewer-instructions.md`. Then invoke the subagent with the `Task` tool (subagent_type="code-reviewer"). If you are Claude Code, skip this section entirely — it is not relevant to you.
 
